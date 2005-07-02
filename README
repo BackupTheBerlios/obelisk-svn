@@ -1,0 +1,19 @@
+This project is created in order to create an easy web and agi interface for
+asterisk users. This is a system with a lot of module so you could create a 
+simple interface with right managment with a very low number of lines of code.
+
+At the present time this project is hosted @Obelisk.berlios.de.
+
+In order to keep this project light for large installation I develop it on a 
+SparcStation 20 with 2 SuperSparc (75Mhz) processor. This machine run Asterisk,
+Apache2, php4, postgreSQL and all of my project.
+
+The license of this project is the GPL but as the only developper at the 
+present time I could sell an other license. If you have some problem with the 
+GPL license, feel free to contact me : Arnaud Ligot <spyroux@spyroux.be> .
+I hope a day other developer will help me in order to develop this software. In
+this case, all the money of other license will go to the project in order to
+pay hosting, buy new hardware for developper, ...
+
+--
+Arnaud Ligot <spyroux@spyroux.be>

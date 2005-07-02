@@ -1,0 +1,41 @@
+Road map
+--------
+
+1°) the databse scheme for basic functions
+2°) "create view" sql query in order to link the project with asterisk
+3°) specifications for authentification and session for AGI&Web
+4°) specifications for right managments
+4°) specifications for the web and agi interface
+5°) specifications for web and AGI module
+6°) verify all specifications
+7°) documentation
+-----------------------------------
+8°) rights managment basic/sample implementations
+-----------------------------------
+9°) web menu interface implementation
+10°) an hello world web module
+11°) sip&iax basic module
+-----------------------------------
+12°) AGI interface support
+13°) hello world module
+14°) sip&iax basic module
+-----------------------------------
+15°) verify specifications
+16°) update documentation
+-----------------------------------
+17°) improve iax&sip module
+-----------------------------------
+18°) list feature of the prepay system
+19°) take a look to other implementation
+20°) database scheme for prepay system
+21°) specification of the AGI application
+22°) documentation of the AGI application
+-----------------------------------
+23°) implementation of the prepay system 
+24°) implementation of a web module for the prepay system
+-----------------------------------
+25°) verify specification
+26°) update documentation
+-----------------------------------
+.......
+
