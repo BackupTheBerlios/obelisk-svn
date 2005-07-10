@@ -2,13 +2,13 @@ Road map
 --------
 
 1°) the databse scheme for basic functions			DONE
-2°) exportation script in php-cli
-3°) specifications for authentification and session for AGI&Web
-4°) specifications for right managments
-4°) specifications for the web and agi interface
-5°) specifications for web and AGI module
+2°) exportation/cron support
+3°) specifications for authentification and session for AGI&Web DONE
+4°) specifications for right managments				DONE
+4°) specifications for the web and agi interface		50%	
+5°) specifications for web and AGI module			25%
 6°) verify all specifications
-7°) documentation
+7°) documentation						25%
 -----------------------------------
 8°) rights managment basic/sample implementations
 -----------------------------------
