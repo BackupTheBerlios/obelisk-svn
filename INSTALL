@@ -5,4 +5,9 @@
 	if you are using PgSQL, run ./db/dbToPg.sh and then import db_pg.sql
 3) edit db/init.sql and then import it into your database
 4) copy obelisk folder where you want (/usr/share/obelisk) for example
-5) edit /usr/share/obelisk/config.inc.php (link it to /etc/obelisk.conf if you prefer)
+5) edit /usr/share/obelisk/config.inc.php (link it to /etc/obelisk.conf if you 
+	prefer)
+6) install modules (module folder)
+7) copy WebMenu.php or AGIMenu.php from the sample folder where you want and 
+	define the menu ID
+8) enjoy
