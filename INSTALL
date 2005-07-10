@@ -1,0 +1,4 @@
+1) install and create a databse
+2) if you are using MySQL, import DB.sql
+	if you are using PgSQL, run ./db/dbToPg.sh and then import db_pg.sql
+3) edit db/init.sql and then import it into your database
