@@ -33,7 +33,7 @@ CREATE TABLE NetworkTimeZone (
   AsteriskDescString VARCHAR(64) NOT NULL,
   Name VARCHAR(32) NOT NULL,
   PRIMARY KEY(ID),
-  UNIQUE INDEX NetworkTimeZone_Unique()
+  UNIQUE INDEX NetworkTimeZone_Unique(Name)
 );
 
 CREATE TABLE AgiSound (
@@ -79,11 +79,11 @@ CREATE TABLE People (
 
 CREATE TABLE People_Settings (
   People_ID INTEGER UNSIGNED NOT NULL,
-  credit DECIMAL(3,4) NOT NULL DEFAULT '0',
+  credit DECIMAL(7,4) NOT NULL DEFAULT '0',
   announce DECIMAL(1) NOT NULL DEFAULT '1',
   ask_HigherCost BOOL NOT NULL,
   PRIMARY KEY(People_ID),
-  INDEX Table_19_FKIndex1(People_ID),
+  INDEX People_Settings_FKIndex1(People_ID),
   FOREIGN KEY(People_ID)
     REFERENCES People(ID)
       ON DELETE NO ACTION
@@ -255,8 +255,8 @@ CREATE TABLE Price (
   Network_ID INTEGER UNSIGNED NOT NULL,
   NetworkProvider_ID INTEGER UNSIGNED NOT NULL,
   NetworkTimeZone_ID INTEGER UNSIGNED NOT NULL,
-  Price DECIMAL(1,4) NOT NULL,
-  ConnectionPrice DECIMAL(1,4) NOT NULL,
+  Price DECIMAL(5,4) NOT NULL,
+  ConnectionPrice DECIMAL(5,4) NOT NULL,
   PRIMARY KEY(Network_ID, NetworkProvider_ID, NetworkTimeZone_ID),
   INDEX Price_FKIndex1(Network_ID),
   INDEX Price_FKIndex2(NetworkProvider_ID),
