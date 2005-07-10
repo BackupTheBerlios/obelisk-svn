@@ -1,8 +1,8 @@
 Road map
 --------
 
-1°) the databse scheme for basic functions
-2°) "create view" sql query in order to link the project with asterisk
+1°) the databse scheme for basic functions			DONE
+2°) exportation script in php-cli
 3°) specifications for authentification and session for AGI&Web
 4°) specifications for right managments
 4°) specifications for the web and agi interface
