@@ -1,3 +1,5 @@
+0) on a debian system you need the folowing packages:
+	asterisk apache php4-{pgsql|mysql|...} php4-cli php4-pear ...
 1) install and create a databse
 2) if you are using MySQL, import DB.sql
 	if you are using PgSQL, run ./db/dbToPg.sh and then import db_pg.sql
