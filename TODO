@@ -1,6 +1,11 @@
 Road map
 --------
 
+EMERGENCY:
+ * DB : dialplan ... use of string instead of number in order to
+ 		match a pattern + priority flag 
+ * move agi_util.php to agi_util.inc.php
+
 * the databse scheme for basic functions			DONE
 * exportation/cron support
 * specifications for authentification and session for AGI&Web 	DONE
