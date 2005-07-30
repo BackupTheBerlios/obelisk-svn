@@ -1,41 +1,44 @@
 Road map
 --------
 
-1°) the databse scheme for basic functions			DONE
-2°) exportation/cron support
-3°) specifications for authentification and session for AGI&Web DONE
-4°) specifications for right managments				DONE
-4°) specifications for the web and agi interface		50%	
-5°) specifications for web and AGI module			25%
-6°) verify all specifications
-7°) documentation						25%
+* the databse scheme for basic functions			DONE
+* exportation/cron support
+* specifications for authentification and session for AGI&Web 	DONE
+* specifications for right managments				DONE
+* specifications for web and AGI module				25%
+* specifications of the folowing AGI				10%
+*	Obelisk(${EXTEN})					45%
+*	Obelisk_menu(${EXTEN})					33%
+*	Obelisk_geo(ID, ${EXTEN})				40%
+* verify all specifications
+* documentation							25%
 -----------------------------------
-8°) rights managment basic/sample implementations
+* rights managment basic/sample implementations
 -----------------------------------
-9°) web menu interface implementation
-10°) an hello world web module
-11°) sip&iax basic module
+* web menu interface implementation
+* an hello world web module
+* sip&iax basic module
 -----------------------------------
-12°) AGI interface support
-13°) hello world module
-14°) sip&iax basic module
+* AGI interface support
+* hello world module
+* sip&iax basic module
 -----------------------------------
-15°) verify specifications
-16°) update documentation
+* verify specifications
+* update documentation
 -----------------------------------
-17°) improve iax&sip module
+* improve iax&sip module
 -----------------------------------
-18°) list feature of the prepay system
-19°) take a look to other implementation
-20°) database scheme for prepay system
-21°) specification of the AGI application
-22°) documentation of the AGI application
+* list feature of the prepay system
+* take a look to other implementation
+* database scheme for prepay system
+* specification of the AGI application
+* documentation of the AGI application
 -----------------------------------
-23°) implementation of the prepay system 
-24°) implementation of a web module for the prepay system
+* implementation of the prepay system 
+* implementation of a web module for the prepay system
 -----------------------------------
-25°) verify specification
-26°) update documentation
+* verify specification
+* update documentation
 -----------------------------------
 .......
 
