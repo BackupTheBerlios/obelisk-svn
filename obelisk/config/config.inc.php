@@ -6,4 +6,10 @@ ini_set('include_path', '.'.PATH_SEPARATOR.'/usr/share/php';
 // the database dsn 
 $dsn = "protocol://user:pass@host/dbname";
 
+// default extension for a non-existing number. 
+// this extension have to be define in the dialplan table for each 
+// callerID.
+//
+// if obelisk cannot found a corresponding default extension, it hangup...
+$default_extension = 0;
 ?>

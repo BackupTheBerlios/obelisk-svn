@@ -37,10 +37,4 @@ function do_webMenu($menuID)
 	}
 }
 
-function do_AGIMenu($menuID)
-{
-	// FIXME: mm chose qu'au dessus mais sort du AGI --> verifier pour 
-	//		la gestion de session
-}
-
 ?>

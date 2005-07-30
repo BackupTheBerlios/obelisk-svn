@@ -8,6 +8,6 @@
 5) edit /usr/share/obelisk/config.inc.php (link it to /etc/obelisk.conf if you 
 	prefer)
 6) install modules (module folder)
-7) copy WebMenu.php or AGIMenu.php from the sample folder where you want and 
+7) copy WebMenu.php from the sample folder where you want and 
 	define the menu ID
 8) enjoy
