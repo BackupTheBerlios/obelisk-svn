@@ -12,4 +12,11 @@ $dsn = "protocol://user:pass@host/dbname";
 //
 // if obelisk cannot found a corresponding default extension, it hangup...
 $default_extension = 0;
+
+// debug level
+define('DEBUG_LEVEL', 1); 	// INFO
+//define('DEBUG_LEVEL', 2); 	// WARNING
+//define('DEBUG_LEVEL', 4); 	// ERROR
+//define('DEBUG_LEVEL', 8);	// CRITICAL
+
 ?>

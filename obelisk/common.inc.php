@@ -1,0 +1,9 @@
+<?
+
+// DEBUG_LEVEL
+DEFINE('DEBUG_INFO', 1);
+DEFINE('DEBUG_WARN', 2);
+DEFINE('DEBUG_ERR', 4);
+DEFINE('DEBUG_CRIT', 8);	// "die" the script
+
+?>
