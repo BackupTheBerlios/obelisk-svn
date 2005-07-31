@@ -1,8 +1,6 @@
 Road map
 --------
 
- * move agi_util.php to agi_util.inc.php
-
 * the databse scheme for basic functions			DONE
 * exportation/cron support
 * specifications for authentification and session for AGI&Web 	DONE
