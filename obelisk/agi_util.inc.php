@@ -95,7 +95,7 @@ function obelisk_dial($extension, $callerId)
  * PRE: a line is writed on stdout
  * POST: log error with agi_log(DEBuG_ERROR, ...);
  * RETURN: <0 : ERR
- * 	   >0 : OK
+ * 	   >0 == result
  */
 function agi_check()
 {
@@ -105,7 +105,16 @@ function agi_check()
 		$code = substr($line, 0, 4);
 		switch($code) {
 			case "200 ":
-				return 200;
+				$a = explode("=", $line);
+
+				// Handle hangup
+				if (substr($a[1], 0, 2) == "-1") {
+					agi_log(DEBUG_CRIT, 
+					     "agi_check(): Hangup detected");
+					agi_terminate();
+				}
+
+				return $a[1];
 			case "510 ":
 				agi_log(DEBUG_ERROR, "510 $line");
 				return -510;
