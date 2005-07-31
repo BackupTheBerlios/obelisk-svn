@@ -45,9 +45,10 @@ CREATE TABLE NetworkProvider (
 );
 
 CREATE TABLE Dialplan (
-  destination DECIMAL(20) NOT NULL AUTO_INCREMENT,
-  source DECIMAL(20) NOT NULL,
-  Action VARCHAR(512) NULL,
+  destination VARCHAR(20) NOT NULL AUTO_INCREMENT,
+  source VARCHAR(20) NOT NULL,
+  Action VARCHAR(512) NOT NULL,
+  priority SMALLINT UNSIGNED NOT NULL,
   PRIMARY KEY(destination, source)
 );
 
