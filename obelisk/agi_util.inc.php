@@ -68,14 +68,20 @@ function agi_log($level, $msg)
  *			using the table dialplan
  *
  * PRE: $extension : a simple extension... ^ is_numeric($extension)
+ *	$isBot indique que si l'extension n'existe pas où si la personne n'est
+ *		pas joingable, il ne faut pas l'annoncer ou démarer le v
+ *		voicemail.
  * POST: look the extension & the caller Id in the database in order to write
  *		(agi_write) the AGI script 
+ *	si l'extension n'est pas joignable ^ !$isBot  ^ (annonce vocale v VM)
+ *		v !joingnable ^ $isBot ^ return -1
+ *		v joingable ^ ouverture de communication
  */
-function obelisk_dial($extension, $callerId)
+function obelisk_dial($extension, $callerId, $isBot=false)
 {
 	global $default_extension;
 
-	agi_log(DEBUG_DEBUG, "obelisk_dial($extension, $callerId)");
+	agi_log(DEBUG_DEBUG, "obelisk_dial($extension, $callerId, $isBot)");
 
 	// get the first line which match with the callerID and the destination
 
