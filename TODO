@@ -10,6 +10,7 @@ Road map
 *	Obelisk(${EXTEN})					45%
 *	Obelisk_menu(${EXTEN})					33%
 *	Obelisk_geo(ID, ${EXTEN})				40%
+*	Obelisk_externam(ID, ${EXTEN})				
 * verify all specifications
 * documentation							25%
 -----------------------------------
