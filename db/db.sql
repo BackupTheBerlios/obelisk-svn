@@ -1,32 +1,6 @@
-CREATE TABLE Module (
-  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  Name VARCHAR(20) NOT NULL,
-  PRIMARY KEY(ID)
-);
-
-CREATE TABLE InternalExtension (
-  Extension INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  callerId VARCHAR(16) NOT NULL,
-  PRIMARY KEY(Extension)
-);
-
 CREATE TABLE Grp (
   ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   Name VARCHAR(32) NOT NULL,
-  PRIMARY KEY(ID)
-);
-
-CREATE TABLE Network (
-  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  Name VARCHAR(64) NOT NULL,
-  PRIMARY KEY(ID)
-);
-
-CREATE TABLE WebInterface (
-  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  Name VARCHAR(20) NOT NULL,
-  ScreenName VARCHAR(40) NOT NULL,
-  LogIn BOOL NOT NULL,
   PRIMARY KEY(ID)
 );
 
@@ -36,20 +10,6 @@ CREATE TABLE NetworkTimeZone (
   Name VARCHAR(32) NOT NULL,
   PRIMARY KEY(ID),
   UNIQUE INDEX NetworkTimeZone_Unique(Name)
-);
-
-CREATE TABLE NetworkProvider (
-  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  Name VARCHAR(32) NOT NULL,
-  PRIMARY KEY(ID)
-);
-
-CREATE TABLE Dialplan (
-  destination VARCHAR(20) NOT NULL AUTO_INCREMENT,
-  source VARCHAR(20) NOT NULL,
-  Action VARCHAR(512) NOT NULL,
-  priority SMALLINT UNSIGNED NOT NULL,
-  PRIMARY KEY(destination, source)
 );
 
 CREATE TABLE Geographical_Group (
@@ -65,20 +25,77 @@ CREATE TABLE Geographical_Group (
       ON UPDATE NO ACTION
 );
 
+CREATE TABLE Network (
+  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  Name VARCHAR(64) NOT NULL,
+  PRIMARY KEY(ID)
+);
+
+CREATE TABLE Module (
+  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  Name VARCHAR(20) NOT NULL,
+  PRIMARY KEY(ID)
+);
+
+CREATE TABLE NetworkProvider (
+  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  Name VARCHAR(32) NOT NULL,
+  PRIMARY KEY(ID)
+);
+
 CREATE TABLE AgiSound (
   ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   Filename VARCHAR(20) NOT NULL,
   PRIMARY KEY(ID)
 );
 
-CREATE TABLE AgiSound_Set (
+CREATE TABLE WebInterface (
   ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  AgiSound_ID INTEGER UNSIGNED NOT NULL,
-  Priority INTEGER UNSIGNED NOT NULL,
-  PRIMARY KEY(ID),
-  INDEX AgiSound_Set_FKIndex1(AgiSound_ID),
-  FOREIGN KEY(AgiSound_ID)
-    REFERENCES AgiSound(ID)
+  Name VARCHAR(20) NOT NULL,
+  ScreenName VARCHAR(40) NOT NULL,
+  LogIn BOOL NOT NULL,
+  PRIMARY KEY(ID)
+);
+
+CREATE TABLE Dialplan (
+  destination VARCHAR(20) NOT NULL AUTO_INCREMENT,
+  source VARCHAR(20) NOT NULL,
+  Action VARCHAR(512) NOT NULL,
+  priority SMALLINT UNSIGNED NOT NULL,
+  PRIMARY KEY(destination, source)
+);
+
+CREATE TABLE People (
+  extension INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  pwd VARCHAR(32) NOT NULL,
+  enable BOOL NOT NULL,
+  mail VARCHAR(50) NOT NULL,
+  PRIMARY KEY(extension)
+);
+
+CREATE TABLE Sip (
+  accountID INTEGER UNSIGNED NOT NULL,
+  People_extension INTEGER UNSIGNED NOT NULL,
+  canreinvite BOOL NOT NULL,
+  host VARCHAR(50) NOT NULL,
+  port SMALLINT UNSIGNED NULL,
+  PRIMARY KEY(accountID, People_extension),
+  INDEX Sip_FKIndex1(People_extension),
+  FOREIGN KEY(People_extension)
+    REFERENCES People(extension)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION
+);
+
+CREATE TABLE People_Settings (
+  People_extension INTEGER UNSIGNED NOT NULL,
+  credit DECIMAL(7,4) NOT NULL DEFAULT '0',
+  announce DECIMAL(1) NOT NULL DEFAULT '1',
+  ask_HigherCost BOOL NOT NULL,
+  PRIMARY KEY(People_extension),
+  INDEX People_Settings_FKIndex1(People_extension),
+  FOREIGN KEY(People_extension)
+    REFERENCES People(extension)
       ON DELETE NO ACTION
       ON UPDATE NO ACTION
 );
@@ -91,47 +108,6 @@ CREATE TABLE NetworkMask (
   INDEX NetworkMask_FKIndex1(Network_ID),
   FOREIGN KEY(Network_ID)
     REFERENCES Network(ID)
-      ON DELETE NO ACTION
-      ON UPDATE NO ACTION
-);
-
-CREATE TABLE People (
-  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  InternalExtension_Extension INTEGER UNSIGNED NOT NULL,
-  pwd VARCHAR(32) NOT NULL,
-  enable BOOL NOT NULL,
-  mail VARCHAR(50) NOT NULL,
-  PRIMARY KEY(ID),
-  INDEX People_FKIndex2(InternalExtension_Extension),
-  FOREIGN KEY(InternalExtension_Extension)
-    REFERENCES InternalExtension(Extension)
-      ON DELETE NO ACTION
-      ON UPDATE NO ACTION
-);
-
-CREATE TABLE Iax (
-  accountID DECIMAL(1,0) NOT NULL,
-  People_ID INTEGER UNSIGNED NOT NULL,
-  notransfer BOOL NOT NULL,
-  host VARCHAR(50) NOT NULL,
-  port SMALLINT UNSIGNED NULL,
-  PRIMARY KEY(accountID, People_ID),
-  INDEX Iax_FKIndex1(People_ID),
-  FOREIGN KEY(People_ID)
-    REFERENCES People(ID)
-      ON DELETE NO ACTION
-      ON UPDATE NO ACTION
-);
-
-CREATE TABLE Module_Action (
-  Module_ID INTEGER UNSIGNED NOT NULL,
-  Action_ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  Name VARCHAR(20) NULL,
-  Description TEXT NULL,
-  PRIMARY KEY(Module_ID, Action_ID),
-  INDEX Module_Action_FKIndex1(Module_ID),
-  FOREIGN KEY(Module_ID)
-    REFERENCES Module(ID)
       ON DELETE NO ACTION
       ON UPDATE NO ACTION
 );
@@ -150,20 +126,53 @@ CREATE TABLE Module_Cron (
 );
 
 CREATE TABLE Geographical_Group_Description (
-  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  InternalExtension_Extension INTEGER UNSIGNED NOT NULL,
+  extension INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   Geographical_Group_ID INTEGER UNSIGNED NOT NULL,
   Name VARCHAR(32) NOT NULL,
   Len SMALLINT UNSIGNED NOT NULL,
-  PRIMARY KEY(ID),
+  PRIMARY KEY(extension),
   INDEX Geographical_Group_Description_FKIndex1(Geographical_Group_ID),
-  INDEX Geographical_Group_Description_FKIndex2(InternalExtension_Extension),
   FOREIGN KEY(Geographical_Group_ID)
     REFERENCES Geographical_Group(ID)
       ON DELETE NO ACTION
-      ON UPDATE NO ACTION,
-  FOREIGN KEY(InternalExtension_Extension)
-    REFERENCES InternalExtension(Extension)
+      ON UPDATE NO ACTION
+);
+
+CREATE TABLE AgiSound_Set (
+  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  AgiSound_ID INTEGER UNSIGNED NOT NULL,
+  Priority INTEGER UNSIGNED NOT NULL,
+  PRIMARY KEY(ID),
+  INDEX AgiSound_Set_FKIndex1(AgiSound_ID),
+  FOREIGN KEY(AgiSound_ID)
+    REFERENCES AgiSound(ID)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION
+);
+
+CREATE TABLE Module_Action (
+  Module_ID INTEGER UNSIGNED NOT NULL,
+  Action_ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  Name VARCHAR(20) NULL,
+  Description TEXT NULL,
+  PRIMARY KEY(Module_ID, Action_ID),
+  INDEX Module_Action_FKIndex1(Module_ID),
+  FOREIGN KEY(Module_ID)
+    REFERENCES Module(ID)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION
+);
+
+CREATE TABLE Iax (
+  accountID DECIMAL(1,0) NOT NULL,
+  People_extension INTEGER UNSIGNED NOT NULL,
+  notransfer BOOL NOT NULL,
+  host VARCHAR(50) NOT NULL,
+  port SMALLINT UNSIGNED NULL,
+  PRIMARY KEY(accountID, People_extension),
+  INDEX Iax_FKIndex1(People_extension),
+  FOREIGN KEY(People_extension)
+    REFERENCES People(extension)
       ON DELETE NO ACTION
       ON UPDATE NO ACTION
 );
@@ -182,6 +191,25 @@ CREATE TABLE Rights (
       ON UPDATE NO ACTION,
   FOREIGN KEY(Module_ID, Module_Action_ID)
     REFERENCES Module_Action(Module_ID, Action_ID)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION
+);
+
+CREATE TABLE AgiInterface (
+  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  Sound_Outtro INTEGER UNSIGNED NOT NULL,
+  Sound_Intro INTEGER UNSIGNED NOT NULL,
+  Name VARCHAR(20) NOT NULL,
+  LogIn BOOL NOT NULL,
+  PRIMARY KEY(ID),
+  INDEX AgiInterface_FKIndex1(Sound_Intro),
+  INDEX AgiInterface_FKIndex2(Sound_Outtro),
+  FOREIGN KEY(Sound_Intro)
+    REFERENCES AgiSound_Set(ID)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION,
+  FOREIGN KEY(Sound_Outtro)
+    REFERENCES AgiSound_Set(ID)
       ON DELETE NO ACTION
       ON UPDATE NO ACTION
 );
@@ -214,54 +242,35 @@ CREATE TABLE WebMenu (
       ON UPDATE NO ACTION
 );
 
-CREATE TABLE AgiInterface (
-  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  Sound_Outtro INTEGER UNSIGNED NOT NULL,
-  Sound_Intro INTEGER UNSIGNED NOT NULL,
-  Name VARCHAR(20) NOT NULL,
-  LogIn BOOL NOT NULL,
-  PRIMARY KEY(ID),
-  INDEX AgiInterface_FKIndex1(Sound_Intro),
-  INDEX AgiInterface_FKIndex2(Sound_Outtro),
-  FOREIGN KEY(Sound_Intro)
-    REFERENCES AgiSound_Set(ID)
-      ON DELETE NO ACTION
-      ON UPDATE NO ACTION,
-  FOREIGN KEY(Sound_Outtro)
-    REFERENCES AgiSound_Set(ID)
-      ON DELETE NO ACTION
-      ON UPDATE NO ACTION
-);
-
 CREATE TABLE Geographical_alias (
   Geographical_Group_ID INTEGER UNSIGNED NOT NULL,
   ext SMALLINT UNSIGNED NOT NULL,
-  People_ID INTEGER UNSIGNED NOT NULL,
+  People_extension INTEGER UNSIGNED NOT NULL,
   PRIMARY KEY(Geographical_Group_ID, ext),
   INDEX Geographical_alias_FKIndex1(Geographical_Group_ID),
-  INDEX Geographical_alias_FKIndex2(People_ID),
+  INDEX Geographical_alias_FKIndex2(People_extension),
   FOREIGN KEY(Geographical_Group_ID)
     REFERENCES Geographical_Group(ID)
       ON DELETE NO ACTION
       ON UPDATE NO ACTION,
-  FOREIGN KEY(People_ID)
-    REFERENCES People(ID)
+  FOREIGN KEY(People_extension)
+    REFERENCES People(extension)
       ON DELETE NO ACTION
       ON UPDATE NO ACTION
 );
 
 CREATE TABLE Grp_has_People (
   Grp_ID INTEGER UNSIGNED NOT NULL,
-  People_ID INTEGER UNSIGNED NOT NULL,
-  PRIMARY KEY(Grp_ID, People_ID),
+  People_extension INTEGER UNSIGNED NOT NULL,
+  PRIMARY KEY(Grp_ID, People_extension),
   INDEX Groups_has_Peoples_FKIndex1(Grp_ID),
-  INDEX Groups_has_Peoples_FKIndex2(People_ID),
+  INDEX Groups_has_Peoples_FKIndex2(People_extension),
   FOREIGN KEY(Grp_ID)
     REFERENCES Grp(ID)
       ON DELETE NO ACTION
       ON UPDATE NO ACTION,
-  FOREIGN KEY(People_ID)
-    REFERENCES People(ID)
+  FOREIGN KEY(People_extension)
+    REFERENCES People(extension)
       ON DELETE NO ACTION
       ON UPDATE NO ACTION
 );
@@ -332,33 +341,6 @@ CREATE TABLE AgiMenu (
       ON UPDATE NO ACTION,
   FOREIGN KEY(Sound_After)
     REFERENCES AgiSound_Set(ID)
-      ON DELETE NO ACTION
-      ON UPDATE NO ACTION
-);
-
-CREATE TABLE Sip (
-  accountID INTEGER UNSIGNED NOT NULL,
-  People_ID INTEGER UNSIGNED NOT NULL,
-  canreinvite BOOL NOT NULL,
-  host VARCHAR(50) NOT NULL,
-  port SMALLINT UNSIGNED NULL,
-  PRIMARY KEY(accountID, People_ID),
-  INDEX Sip_FKIndex1(People_ID),
-  FOREIGN KEY(People_ID)
-    REFERENCES People(ID)
-      ON DELETE NO ACTION
-      ON UPDATE NO ACTION
-);
-
-CREATE TABLE People_Settings (
-  People_ID INTEGER UNSIGNED NOT NULL,
-  credit DECIMAL(7,4) NOT NULL DEFAULT '0',
-  announce DECIMAL(1) NOT NULL DEFAULT '1',
-  ask_HigherCost BOOL NOT NULL,
-  PRIMARY KEY(People_ID),
-  INDEX People_Settings_FKIndex1(People_ID),
-  FOREIGN KEY(People_ID)
-    REFERENCES People(ID)
       ON DELETE NO ACTION
       ON UPDATE NO ACTION
 );
