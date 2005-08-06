@@ -67,17 +67,21 @@ CREATE TABLE Dialplan (
 
 CREATE TABLE People (
   extension INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  pwd VARCHAR(32) NOT NULL,
+  username VARCHAR(32) NOT NULL,
+  Name VARCHAR(48) NOT NULL,
+  FirstName VARCHAR(48) NOT NULL,
+  pwd INTEGER UNSIGNED NOT NULL,
   enable BOOL NOT NULL,
   mail VARCHAR(50) NOT NULL,
-  PRIMARY KEY(extension)
+  PRIMARY KEY(extension),
+  UNIQUE INDEX People_usernameUniq(username)
 );
 
 CREATE TABLE Sip (
   accountID INTEGER UNSIGNED NOT NULL,
   People_extension INTEGER UNSIGNED NOT NULL,
   canreinvite BOOL NOT NULL,
-  host VARCHAR(50) NOT NULL,
+  host VARCHAR(50) NULL,
   port SMALLINT UNSIGNED NULL,
   PRIMARY KEY(accountID, People_extension),
   INDEX Sip_FKIndex1(People_extension),
