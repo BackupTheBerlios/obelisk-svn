@@ -6,40 +6,14 @@ Road map
 * specifications for authentification and session for AGI&Web 	DONE
 * specifications for right managments				DONE
 * specifications for web and AGI module				25%
-* specifications of the folowing AGI				10%
-*	Obelisk(${EXTEN})					45%
-*	Obelisk_menu(${EXTEN})					33%
-*	Obelisk_geo(ID, ${EXTEN})				40%
+* AGI:								DONE
+*	Obelisk(${EXTEN})					10%
+*	Obelisk_menu(${EXTEN})					25%
+*	Obelisk_geo(ID, ${EXTEN})				25%
 *	Obelisk_external(ID, ${EXTEN})				
 * verify all specifications
 * documentation							25%
 -----------------------------------
 * rights managment basic/sample implementations
 -----------------------------------
-* web menu interface implementation
-* an hello world web module
-* sip&iax basic module
------------------------------------
-* AGI interface support
-* hello world module
-* sip&iax basic module
------------------------------------
-* verify specifications
-* update documentation
------------------------------------
-* improve iax&sip module
------------------------------------
-* list feature of the prepay system
-* take a look to other implementation
-* database scheme for prepay system
-* specification of the AGI application
-* documentation of the AGI application
------------------------------------
-* implementation of the prepay system 
-* implementation of a web module for the prepay system
------------------------------------
-* verify specification
-* update documentation
------------------------------------
-.......
 
