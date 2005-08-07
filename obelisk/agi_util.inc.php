@@ -77,16 +77,43 @@ function agi_log($level, $msg)
  *		v !joingnable ^ $isBot ^ return -1
  *		v joingable ^ ouverture de communication
  */
-function obelisk_dial($extension, $callerId, $isBot=false)
+function obelisk_dial($extension, $isBot=false)
 {
-	global $default_extension;
+	global $callerId, $callerIdFull;
 
-	agi_log(DEBUG_DEBUG, "obelisk_dial($extension, $callerId, $isBot)");
+	agi_log(DEBUG_DEBUG, "obelisk_dial($extension, $isBot)");
 
-	// get the first line which match with the callerID and the destination
+	$query = "Select Action ".
+		 "from Dialplan ".
+		 "where extension = $extension ".
+		 "  and source = $callerId ".
+		 "order by priority";
 
-	// output the value of this pair or call a not reachable extension 
-	//				--> see config.php
+	$query = $db->query($query);
+	check_db();
+
+	if ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED)) 
+	{
+		agi_log(DEBUG_DEBUG, "agi_obelisk.php: FOUND : ".$row[0]);
+		
+		agi_write($row[0]);
+
+		agi_log(DEBUG_INF, "agi_obelisk.php: DONE");
+	}
+	else
+	{
+
+		if ($extension = DEFAULT_EXTENSION)
+			// impossible de trouver l'extension par défaut
+			agi_log(DEBUG_CRIT, "agi_obelisk.php: DEFAULT EXTENSION NOT FOUND");
+		else 
+		{
+			agi_log(DEBUG_INFO, "agi_obelisk.php: NOT FOUND -> ".
+				"switching to default extension");
+			agi_write("SET EXTENSION ".DEFAULT_EXTENSION);
+			agi_write("EXEC AGI(".AGI_PATH."/agi_obelisk.php");
+		}
+	}
 
 	agi_log(DEBUG_CRIT, "please implement obelisk_dial");
 
