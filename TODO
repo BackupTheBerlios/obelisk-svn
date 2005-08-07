@@ -2,7 +2,7 @@ Road map
 --------
 
 * the databse scheme for basic functions			DONE
-* exportation/cron support
+* exportation/cron support					DONE
 * specifications for authentification and session for AGI&Web 	DONE
 * specifications for right managments				DONE
 * specifications for web and AGI module				25%
