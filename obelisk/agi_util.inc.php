@@ -66,59 +66,55 @@ function agi_log($level, $msg)
 }
 
 /**
- * obelisk_dial - write asterisk AGI code in order to call $extension as $callerID
+ * agi_dial - write asterisk AGI code in order to call $extension as $callerID
  *			using the table dialplan
  *
  * PRE: $extension : a simple extension... ^ is_numeric($extension)
- *	$isBot indique que si l'extension n'existe pas où si la personne n'est
- *		pas joingable, il ne faut pas l'annoncer ou démarer le v
- *		voicemail.
+ *	$callerId : extension of the caller inside the local network
+ *			^ is_numeric($callerId)
+ *	$callerIdFull : complete callerId given by asterisk
+ *
  * POST: look the extension & the caller Id in the database in order to write
  *		(agi_write) the AGI script 
- *	si l'extension n'est pas joignable ^ !$isBot  ^ (annonce vocale v VM)
- *		v !joingnable ^ $isBot ^ return -1
- *		v joingable ^ ouverture de communication
+ *	si l'extension n'est pas joignable ^ annonce vocale ^ 
+ *			return a negative number.
+ *		v joingnable ^ ouverture de communication ^ 
+ * 			return a positive value (incl. 0)  which is 
+ *				the price of the call
  */
-function obelisk_dial($extension, $isBot=false)
+function obelisk_dial($extension, $callerId, $callerIdFull)
 {
-	global $callerId, $callerIdFull;
 
 	agi_log(DEBUG_DEBUG, "obelisk_dial($extension, $isBot)");
 
-	$query = "Select Action ".
-		 "from Dialplan ".
-		 "where extension = $extension ".
-		 "  and source = $callerId ".
-		 "order by priority";
+	$query = "Select name ".
+		 "from Extension, Module ".
+		 "where ((end is not null and extension <= $extension ".
+		 "  and end >= $callerId) or ".
+		 " (end is null and extension = $extension))".
+		 " and Module_ID = Module.ID ";
 
 	$query = $db->query($query);
 	check_db();
 
 	if ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED)) 
 	{
-		agi_log(DEBUG_DEBUG, "agi_obelisk.php: FOUND : ".$row[0]);
+		agi_log(DEBUG_DEBUG, "agi_obelisk.php: extension ".
+			$extension." is handeled by : ".$row[0]);
 		
-		agi_write($row[0]);
+		// on tente d'inclure le dial du module en question
+		include('modules/'.$row[0].'/dial.inc.php');
 
+		// on génère le nom de la fonction dial
+		$fct = $row[0].'_dial';
+		return $fct($extension, $callerId, $callerIdFull);
+		
 		agi_log(DEBUG_INF, "agi_obelisk.php: DONE");
 	}
 	else
 	{
-
-		if ($extension = DEFAULT_EXTENSION)
-			// impossible de trouver l'extension par défaut
-			agi_log(DEBUG_CRIT, "agi_obelisk.php: DEFAULT EXTENSION NOT FOUND");
-		else 
-		{
-			agi_log(DEBUG_INFO, "agi_obelisk.php: NOT FOUND -> ".
-				"switching to default extension");
-			agi_write("SET EXTENSION ".DEFAULT_EXTENSION);
-			agi_write("EXEC AGI(".AGI_PATH."/agi_obelisk.php");
-		}
+		return agi_notFound($extension, $callerId, $callerIdFull);
 	}
-
-	agi_log(DEBUG_CRIT, "please implement obelisk_dial");
-
 }
 
 /**
@@ -241,11 +237,28 @@ function agi_error_handler($errno, $errstr, $errfile, $errline)
 function agi_notFound($extension, $callerId, $callerIdFull)
 {
 	agi_log(DEBUG_CRIT, "agi_notFound: not yet implemented");
+	
+	/* 
+	if ($extension = DEFAULT_EXTENSION)
+			// impossible de trouver l'extension par défaut
+			agi_log(DEBUG_CRIT, "agi_obelisk.php: DEFAULT EXTENSION NOT FOUND");
+		else 
+		{
+			agi_log(DEBUG_INFO, "agi_obelisk.php: NOT FOUND -> ".
+				"switching to default extension");
+			agi_write("SET EXTENSION ".DEFAULT_EXTENSION);
+			agi_write("EXEC AGI(".AGI_PATH."/agi_obelisk.php");
+		}
+	}
+
+	agi_log(DEBUG_CRIT, "please implement obelisk_dial"); 
+
+	*/
 }
 
 function agi_callPep($id, $callerId, $callerIdFull)
 {
-
+	agi_log(DEBUG_CRIT, "agi_notFound: not yet implemented");
 }
 
 ?>
