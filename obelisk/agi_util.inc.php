@@ -82,7 +82,7 @@ function agi_log($level, $msg)
  * 			return a positive value (incl. 0)  which is 
  *				the price of the call
  */
-function obelisk_dial($extension, $callerId, $callerIdFull)
+function agi_dial($extension, $callerId, $callerIdFull)
 {
 
 	agi_log(DEBUG_DEBUG, "obelisk_dial($extension, $isBot)");
