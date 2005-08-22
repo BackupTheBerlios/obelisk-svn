@@ -24,6 +24,8 @@ while ($line = agi_read()) {
 
 // get the extension in $extension
 
+// get the params as $params[$id]
+
 // some functions
  
 /**
@@ -234,6 +236,16 @@ function agi_error_handler($errno, $errstr, $errfile, $errline)
 						$errstr);
 			break;
 	}
+}
+
+function agi_notFound($extension, $callerId, $callerIdFull)
+{
+	agi_log(DEBUG_CRIT, "agi_notFound: not yet implemented");
+}
+
+function agi_callPep($id, $callerId, $callerIdFull)
+{
+
 }
 
 ?>

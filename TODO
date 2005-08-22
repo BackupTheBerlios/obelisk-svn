@@ -5,11 +5,11 @@ Road map
 * exportation/cron support					DONE
 * specifications for authentification and session for AGI&Web 	DONE
 * specifications for right managments				DONE
-* specifications for web and AGI module				25%
+* specifications for web and AGI module				 25%
 * AGI:								DONE
-*	Obelisk(${EXTEN})					10%
-*	Obelisk_menu(${EXTEN})					25%
-*	Obelisk_geo(ID, ${EXTEN})				25%
+*	Obelisk(${EXTEN})					 10%
+*	Obelisk_menu(${EXTEN})					  5%
+*	Obelisk_geo(ID, ${EXTEN})				100%
 *	Obelisk_external(ID, ${EXTEN})				
 * verify all specifications
 * documentation							25%
