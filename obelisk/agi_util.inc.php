@@ -238,22 +238,18 @@ function agi_notFound($extension, $callerId, $callerIdFull)
 {
 	agi_log(DEBUG_CRIT, "agi_notFound: not yet implemented");
 	
-	/* 
+	 
 	if ($extension = DEFAULT_EXTENSION)
-			// impossible de trouver l'extension par défaut
-			agi_log(DEBUG_CRIT, "agi_obelisk.php: DEFAULT EXTENSION NOT FOUND");
+	// impossible de trouver l'extension par défaut
+		agi_log(DEBUG_CRIT, 
+				"agi_obelisk.php: DEFAULT EXTENSION NOT FOUND");
 		else 
 		{
 			agi_log(DEBUG_INFO, "agi_obelisk.php: NOT FOUND -> ".
 				"switching to default extension");
-			agi_write("SET EXTENSION ".DEFAULT_EXTENSION);
-			agi_write("EXEC AGI(".AGI_PATH."/agi_obelisk.php");
+			agi_dial(DEFAULT_EXTENSION, $callerId, $callerIdFull);
 		}
 	}
-
-	agi_log(DEBUG_CRIT, "please implement obelisk_dial"); 
-
-	*/
 }
 
 function agi_callPep($id, $callerId, $callerIdFull)

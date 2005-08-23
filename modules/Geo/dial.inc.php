@@ -28,8 +28,8 @@ function geo_dial($extension, $callerId, $callerIdFull)
 	agi_log(DEBUG_DEBUG, "geo/dial.inc.php: Geo Group : ".$grp_name);
 	
 	$query = "select People_ID from Geographical_alias".
-		   "where ext = $extension and Geographical_Group_Extension=".
-		   	$grp_ext.
+		   "where Extension = $extension ".
+		   "  and Geographical_Group_Extension=".$grp_ext.
 			
 	$query = $db->query($query);
 	check_db();
