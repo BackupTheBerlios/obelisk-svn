@@ -2,6 +2,8 @@
 
 function geo_dial($extension, $callerId, $callerIdFull)
 {
+	global $db;
+
 	$geoGrpId = $params[0];
 
 	// On commence par récupérer le groupe où pourrait se trouver 

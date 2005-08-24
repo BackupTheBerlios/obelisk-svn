@@ -1,3 +1,10 @@
+CREATE TABLE Account_Channel (
+  ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  ChanType CHAR(3) NOT NULL,
+  PRIMARY KEY(ID),
+  UNIQUE INDEX Account_Channel_UNIQ_CT(ChanType)
+);
+
 CREATE TABLE AgiInterface (
   ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   Sound_Outtro INTEGER UNSIGNED NOT NULL,
@@ -7,6 +14,19 @@ CREATE TABLE AgiInterface (
   PRIMARY KEY(ID),
   INDEX AgiInterface_FKIndex1(Sound_Intro),
   INDEX AgiInterface_FKIndex2(Sound_Outtro)
+);
+
+CREATE TABLE AgiLog (
+  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  Responsable_Extension INTEGER UNSIGNED NOT NULL,
+  LogWhen DATETIME NOT NULL DEFAULT 'now()',
+  CallerId VARCHAR(64) NOT NULL,
+  Extension BIGINT NOT NULL,
+  Price INTEGER UNSIGNED NOT NULL,
+  Duration INTEGER UNSIGNED NOT NULL,
+  CallStatus VARCHAR(15) NOT NULL,
+  PRIMARY KEY(ID),
+  INDEX AgiLog_FKIndex1(Responsable_Extension)
 );
 
 CREATE TABLE AgiMenu (
@@ -46,26 +66,28 @@ CREATE TABLE AgiSound_Set (
 );
 
 CREATE TABLE Extension (
-  Extension INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  Extension BIGINT NOT NULL AUTO_INCREMENT,
+  Responsable_Extension INTEGER UNSIGNED NOT NULL,
   Module_ID INTEGER UNSIGNED NOT NULL,
-  ext_end INTEGER UNSIGNED NULL,
+  ext_end BIGINT NULL,
   PRIMARY KEY(Extension),
-  INDEX extension_FKIndex1(Module_ID)
+  INDEX extension_FKIndex1(Module_ID),
+  INDEX Extension_FKIndex2(Responsable_Extension)
 );
 
 CREATE TABLE Geographical_alias (
-  ext SMALLINT UNSIGNED NOT NULL,
-  Geographical_Group_ID INTEGER UNSIGNED NOT NULL,
-  People_ID INTEGER UNSIGNED NOT NULL,
-  PRIMARY KEY(ext, Geographical_Group_ID),
-  INDEX Geographical_alias_FKIndex1(Geographical_Group_ID)
+  Extension SMALLINT UNSIGNED NOT NULL,
+  Geographical_Group_Extension INTEGER UNSIGNED NOT NULL,
+  People_Extension INTEGER UNSIGNED NOT NULL,
+  PRIMARY KEY(Extension, Geographical_Group_Extension),
+  INDEX Geographical_alias_FKIndex1(Geographical_Group_Extension)
 );
 
 CREATE TABLE Geographical_Group (
-  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  Extension INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   Name VARCHAR(32) NOT NULL,
   Len SMALLINT UNSIGNED NOT NULL,
-  PRIMARY KEY(ID)
+  PRIMARY KEY(Extension)
 );
 
 CREATE TABLE Grp (
@@ -76,18 +98,19 @@ CREATE TABLE Grp (
 
 CREATE TABLE Grp_has_People (
   Grp_ID INTEGER UNSIGNED NOT NULL,
-  People_ID INTEGER UNSIGNED NOT NULL,
-  PRIMARY KEY(Grp_ID, People_ID),
+  People_Extension INTEGER UNSIGNED NOT NULL,
+  PRIMARY KEY(Grp_ID, People_Extension),
   INDEX Groups_has_Peoples_FKIndex1(Grp_ID)
 );
 
 CREATE TABLE Iax (
-  accountID DECIMAL(1,0) NOT NULL,
-  People_ID INTEGER UNSIGNED NOT NULL,
+  VoIPAccount_ID INTEGER UNSIGNED NOT NULL,
+  VoIPAccount_People_Extension INTEGER UNSIGNED NOT NULL,
   notransfer BOOL NOT NULL,
   host VARCHAR(50) NOT NULL,
   port SMALLINT UNSIGNED NULL,
-  PRIMARY KEY(accountID, People_ID)
+  PRIMARY KEY(VoIPAccount_ID, VoIPAccount_People_Extension),
+  INDEX Iax_FKIndex1(VoIPAccount_People_Extension, VoIPAccount_ID)
 );
 
 CREATE TABLE Module (
@@ -134,23 +157,24 @@ CREATE TABLE NetworkTimeZone (
 );
 
 CREATE TABLE People (
-  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  Extension INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   username VARCHAR(32) NOT NULL,
   Name VARCHAR(48) NOT NULL,
   FirstName VARCHAR(48) NOT NULL,
   pwd INTEGER UNSIGNED NOT NULL,
   enable BOOL NOT NULL,
   mail VARCHAR(50) NOT NULL,
-  PRIMARY KEY(ID),
+  PRIMARY KEY(Extension),
   UNIQUE INDEX People_usernameUniq(username)
 );
 
-CREATE TABLE People_Settings (
-  People_ID INTEGER UNSIGNED NOT NULL,
-  credit DECIMAL(7,4) NOT NULL DEFAULT '0',
-  announce DECIMAL(1) NOT NULL DEFAULT '1',
-  ask_HigherCost BOOL NOT NULL,
-  PRIMARY KEY(People_ID)
+CREATE TABLE People_PrePay_Settings (
+  People_Extension INTEGER UNSIGNED NOT NULL,
+  Credit DECIMAL(8,4) NOT NULL DEFAULT '0',
+  Announce DECIMAL(1) NOT NULL DEFAULT '1',
+  AskHigherCost BOOL NOT NULL,
+  AllowOtherCID BOOL NOT NULL,
+  PRIMARY KEY(People_Extension)
 );
 
 CREATE TABLE Price (
@@ -165,6 +189,13 @@ CREATE TABLE Price (
   INDEX Price_FKIndex3(NetworkTimeZone_ID)
 );
 
+CREATE TABLE Raw_Extension (
+  Extension INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  price DECIMAL(5,4) NOT NULL,
+  agi VARCHAR(512) NOT NULL,
+  PRIMARY KEY(Extension)
+);
+
 CREATE TABLE Rights (
   Grp_ID INTEGER UNSIGNED NOT NULL,
   Module_Action_ID INTEGER UNSIGNED NOT NULL,
@@ -176,12 +207,23 @@ CREATE TABLE Rights (
 );
 
 CREATE TABLE Sip (
-  accountID INTEGER UNSIGNED NOT NULL,
-  People_ID INTEGER UNSIGNED NOT NULL,
+  VoIPAccount_ID INTEGER UNSIGNED NOT NULL,
+  VoIPAccount_People_Extension INTEGER UNSIGNED NOT NULL,
   canreinvite BOOL NOT NULL,
   host VARCHAR(50) NULL,
   port SMALLINT UNSIGNED NULL,
-  PRIMARY KEY(accountID, People_ID)
+  PRIMARY KEY(VoIPAccount_ID, VoIPAccount_People_Extension),
+  INDEX Sip_FKIndex1(VoIPAccount_People_Extension, VoIPAccount_ID)
+);
+
+CREATE TABLE VoIPAccount (
+  People_Extension INTEGER UNSIGNED NOT NULL,
+  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  Account_Channel_ID SMALLINT UNSIGNED NOT NULL,
+  Enable BOOL NOT NULL,
+  PRIMARY KEY(People_Extension, ID),
+  INDEX VoIPAccount_FKIndex1(People_Extension),
+  INDEX VoIPAccount_FKIndex2(Account_Channel_ID)
 );
 
 CREATE TABLE WebInterface (

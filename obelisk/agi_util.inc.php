@@ -84,13 +84,14 @@ function agi_log($level, $msg)
  */
 function agi_dial($extension, $callerId, $callerIdFull)
 {
-
+	global $db;
+	
 	agi_log(DEBUG_DEBUG, "obelisk_dial($extension, $isBot)");
 
 	$query = "Select name ".
 		 "from Extension, Module ".
 		 "where ((end is not null and extension <= $extension ".
-		 "  and end >= $callerId) or ".
+		 "  and end >= $extension) or ".
 		 " (end is null and extension = $extension))".
 		 " and Module_ID = Module.ID ";
 
@@ -165,6 +166,7 @@ function agi_check()
  * GLOBAL: $stdout - must be initialised to a correct value with fopen();
  * PRE: $agi - valid agi script
  * I/O: stdout .= $agi
+ * POST: wait for result and return the last result
  */
 function agi_write($agi)
 {
@@ -184,8 +186,10 @@ function agi_write($agi)
 		fputs($stdout, $line."\n");
 		
 		// check the result
-		agi_check();
+		$result = agi_check();
 	}
+
+	return $result;
 }
 
 /**
@@ -206,6 +210,17 @@ function agi_read()
 	agi_log(DEBUG_INF, "agi_read() : \"$input\"");
 	
 	return $input;
+}
+
+/**
+ * agi_getVar - renvoie le contenu de la variable 
+ */
+function agi_getVar($varname) 
+{
+	$result = agi_write("GET VARIABLE \"".$varname."\"");
+	$result = preg_replace('/.*\((.*)\).*/i', '${1}', $result);
+	agi_log(DEBUG-DEBUG, "agi_getVar '".$varname."' = '".$variable . "'");
+	return $result;
 }
 
 /**
@@ -237,7 +252,6 @@ function agi_error_handler($errno, $errstr, $errfile, $errline)
 function agi_notFound($extension, $callerId, $callerIdFull)
 {
 	agi_log(DEBUG_CRIT, "agi_notFound: not yet implemented");
-	
 	 
 	if ($extension = DEFAULT_EXTENSION)
 	// impossible de trouver l'extension par défaut
@@ -252,9 +266,150 @@ function agi_notFound($extension, $callerId, $callerIdFull)
 	}
 }
 
-function agi_callPep($id, $callerId, $callerIdFull)
+/**
+ * agi_call - place a call on asterisk server. 
+ *
+ * It executes Dial($callStr...) and add support for prepay system
+ *
+ * PRE : * if the destination is a local destinatin, this destination exist
+ *	 * $extension: only use for logging purpose
+ *	 * $callStr, destination for Dial application of asterisk
+ *	 * $callOptions << !!!!!!!!!! USE THIS WITH CARE !!!!!!!!
+ *	 * $priceConn connection price
+ *	 * $price the price/minutes of the call
+ * 	 * $callerId a the callerId (only the number)
+ *	 * $callerIdFull : full callerId
+ *
+ *
+ * POST : * call is logged
+ *	  * prepay card of the callerId is updated if the call succeed 
+ * 		^ if the call is not free
+ *	  * if the callerId is not a person, it checks for a owner
+ *	  	of the callerId in the database and use his prepaid card
+ *	  * return the price of the call
+ */
+	  
+function agi_call($extension, $callStr, $callOptions, 
+		  $priceConn, $price, 
+		  $callerId, $callerIdFull)
 {
-	agi_log(DEBUG_CRIT, "agi_notFound: not yet implemented");
+	global $db;
+	
+	agi_log(DEBUG_DEBUG, "agi_call : $callSer, $priceConn, ".
+				"$price, $callerId, $callerIdFull");
+	
+	// first I check if the callerId is a valid person in the database
+	$query = 	"select P.Credit, P.Announce, P.AskHigherCost ".
+		 	"  from People_PrePay_Settings as P,  ".
+		 	" where People_Extension = $callerId ";
+	$query = $db->query($query);
+	check_db();
+
+
+	if (!($row = $query->fetchRow(DB_FETCHMODE_ORDERED)))
+	{
+		// aucune personne trouvée dans la base de donnée avec 
+		// le callerId $callerId --> recherche de la personne 
+		// responsable et vérification si elle accepte d'être 
+		// facturée pour quelqu'un d'autre...
+		$query = "select P.Credit, P.Announce, P.AskHigherCost, ".
+			 "	P.Responsable_Extension ".
+			 "  from People_PrePay_Settings as P, Extension as E ".
+			 " where P.People_Extension = E.Responsable_Extension ".
+			 "   and P.AllowOtherCID = true ".
+			 "   and ((end is not null and extension<=$callerId".
+			 "         and end >= $callerId) or ".
+		 	 "        (end is null and extension = $callerId))"
+		
+		if (!($row = $query->fetchRow(DB_FETCHMODE_ORDERED)))
+		{
+			$found = true;
+			$account = $row[3];
+			$credit = $row[0];
+			$announce = $row[1]; 
+			$ask = $row[2];
+
+		}
+		else
+		{
+			// introuvable
+			$found = false;
+			$accont = ""; 
+			$credit = 0; 
+			$announce = false; 
+			$ask = false;
+		}
+	}
+	else
+	{
+		// le callerId appartient à une personne de même extension
+		$found = true;
+		$account = $callerId;
+		$credit = $row[0];
+		$announce = $row[1]; 
+		$ask = $row[2];
+	}
+
+	if (($price + $priceConn) > $credit )
+		// pas assez de crédit d'appel pour effectuer l'appel en 
+		// question
+		return agi_dial(NOT_ENOUGH_MONEY, $callerId, $callerIdFull);
+	
+	// bon on a assez de soux que pour faire l'appel.... on dial
+	$maxSec = ($credit-$priceConn)/$price*60;
+	agi_write("EXEC DIAL ${callStr}||${callOptions}L(${maxSec})");
+	
+	$answeredTime = agi_getVar("ANSWEREDTIME");
+	$dialStatus = agi_getVar("DIALSTATUS");
+
+	agi_log(DEBUG_INFO, "agi_dial : $extension -> $callStr ".
+				": $dialStatus : $answeredTime");
+	
+	$total = $priceConn + ceil($answeredTime/60);
+	if ($dialStatus == "ANSWER")
+	{
+		agi_credit($account, -($total);
+		agi_logCall($extension, $callerId, $account, 
+			    $price, $answeredTime, $dialStatus);
+	}
+
+	return $total;
+}
+
+/** 
+ * agi_logCall - log a call into the database
+ *
+ */
+function agi_logCall ($extension, $callerId, $account, $price, $time, $status)
+{
+	global $db;
+	
+	agi_log(DEBUG_INF, "agi_logCall : $extension, $callerId, $account, ".
+				"$price, $time, $status");
+				
+	$query = "insert into AgiLog values (DEFAULT, now(), ".
+		 "$callerId, $extension, $price, $status)";
+	
+	$db->query($query);
+
+	check_db();
+}
+
+/**
+ * agi_credit - add or remove an amount of money from an account
+ *
+ */
+function agi_credit($account, $modification)
+{
+	global $db;
+	
+	agi_log(DEBUG_DEBUG, "agi_credit: $account + ($modification) ");
+	
+	$query = "update People_PrePay_Settings ".
+	         "set credit = credit + (${modification}) "
+		 "where People_Extension = $callerId ";
+	
+	$db->query($query);
 }
 
 ?>

@@ -14,6 +14,7 @@ $dsn = "protocol://user:pass@host/dbname";
 // callerID.
 //
 // if obelisk cannot found a corresponding default extension, it hangup...
-DEFINE('DEFAULT_EXTENSION', 0);;
-
+DEFINE('DEFAULT_EXTENSION', 0);
+DEFINE('NOT_ENOUGH_MONEY', '1'); // NOT YET IMPLEMENTED
+DEFINE('END_OF_MONEY', 2);	 // NOT YET IMPLEMENTED
 ?>
