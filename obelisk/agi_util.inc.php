@@ -174,7 +174,8 @@ function agi_check($no_kill = false)
 	if ($no_kill)
 		return -1;
 	else
-		agi_log(DEBUG_CRIT, "agi_check(): there is something strange here");
+		agi_log(DEBUG_CRIT, "agi_check(): there is something ".
+				"strange here");
 }
 
 /**
@@ -186,7 +187,7 @@ function agi_check($no_kill = false)
  *		return an error. This could be use for example in order to 
  *		bill the start of the communication of dial an other number
  * I/O: stdout .= $agi
- * POST: wait for result and return the last result
+ * POST: wait for result and return the last result (use agi_check)
  */
 function agi_write($agi, $no_kill)
 {
@@ -341,6 +342,9 @@ function agi_call($extension, $callStr, $callOptions,
 			 "         and end >= $callerId) or ".
 		 	 "        (end is null and extension = $callerId))"
 		
+		$query = $db->query($query);
+		check_db();
+		
 		if (!($row = $query->fetchRow(DB_FETCHMODE_ORDERED)))
 		{
 			$found = true;
@@ -411,7 +415,6 @@ function agi_logCall ($extension, $callerId, $account, $price, $time, $status)
 		 "$callerId, $extension, $price, $status)";
 	
 	$db->query($query);
-
 	check_db();
 }
 
@@ -432,4 +435,182 @@ function agi_credit($account, $modification)
 	$db->query($query);
 }
 
+/**
+ * agi_play - play a sound and allow $dtmf to stop this sound. This
+ *		function take an Id of the sound in the database as paramter
+ *		and look in this database in order to get the filename.
+ *		
+ *		This function doesn't check if the file really exist but if the
+ *		Id of the sound doesn't exist it's return -1
+ *
+ * PRE: $soundId : the Id of the sound in the database
+ *	$dtmf : allowed dtmf
+ * POST: $soundId is played if the Id is corrected
+ *	return 	-1 : if there is an error
+ *		 0 : if the song is correctly played and not stopped
+ *		 a dtmf (0 is return as 10, # as '#' and * as '*'
+ */
+function agi_play($soundId, $dtmf = "0123456789#*");
+{
+	$query = "Select Filename from AgiSound where ID=$soundId";
+
+	$query = $db->query($query);
+	check_db();
+	
+	if (!($row = $query->fetchRow(DB_FETCHMODE_ORDERED))
+		return -1;
+	
+	$result = agi_write("STREAM FILE \"".$row[0]."\" \"${dtmf}\"", true);
+	/* 
+		Returns:
+		failure: -1 endpos=<sample offset>
+		failure on open: 0 endpos=0
+		success: 0 endpos=<offset>
+		digit pressed: <digit> endpos=<offset>
+	*/
+  
+  	$first = explode(" ", $result);
+	$first = $first[0];
+
+	$second = explode("=", $result);
+	$second = $second[1];
+
+	if ($first == -1 || ($first == 0 && $second == 0))
+		return -1; // failure
+	
+	if ($first == 0)
+		return 0;  // success
+	
+	$first = chr($first);
+
+	if ($first == 0)
+		$first = 10;
+	
+	return $first;
+}
+
+/**
+ * agi_play_soundSet - play a soundset.
+ *
+ * PRE : *soundSetId
+ * POST : same as above
+ *
+ *      it reads the sound respecting the priority flag of the databse
+ *	and stop all the sound after the first matching dtmf
+ *
+ */
+function agi_play_soundSet($soundSetId, $dtmf = "0123456789*#")
+{
+	$query = "select Filename ".
+		 "from AgiSound, AgiSound_Set ".
+		 "where AgiSound.IF = AgiSound_ID ".
+		 "order by Priority";
+	
+	$query = $db->query($query);
+	check_db();
+
+	unset($result);
+	while ($row = $query->fetchRow(DB_FETCHMODE_ORDERED))
+	{
+		$result = agi_play($row[0], $dtmf);
+
+		if ($result != 0)
+			return $result;
+	}
+	if (!isset($result))
+		return -1;
+	else
+		return 0;
+}
+
+/**
+ * agi_play_soundSet_read - play a soundset and read at least $min digit and
+ *				maximum $max digit from the user. The user has
+ *				to use the pound key in order to enter a 
+ *				number of digit lower than the $maximum number
+ *				of digit. 
+ *
+ * PRE: * $soundSetId : the Id of the soundset. If not found, return -1
+ *	* $min the minimum number of digit. Below this number pound keu is 
+ *		ignored
+ *	* $max must be higher or equal to the minimum.
+ * 	* $timeout : if the user doesn't enter any digit after $timeout seconds
+ *			it replays the soundset.
+ *	* $max_replay : maximum number of timeout --> return -1;
+ *
+ * POST:* plays the soundset and stops it after received the first digit
+ *	* the star key replay the soundSet
+ *	* return positive number = the value that the user enter
+ *			 < 10^($max)-1
+ *	        negative number : an error
+ *	 	zero is a mositive number
+ *	
+ *	*    if the user enter 007, and that the minimum is 3, it's accepted
+ *		but return an integer : 7
+ */
+function agi_play_soundSet_read($soundSetId, $min, $max, $timeout = 20, 
+					$max_replay=3)
+{
+	$ndigits = 0;
+	$result = 0;
+	$tempRes = agi_play_soundSet($soundSetId);
+	$max_replay--;
+
+	if ($tempRes == 0)
+		// pas de digit lue, on fait une première pause
+		// dans le but de ne pas faire entendre à l'utilisateur le
+		// prompt immédiatement après
+		$tempRes = agi_readDigit($timout);
+
+	while ($ndigits < $max)
+	{
+		if ($tempRes == -1)
+			return -1;	// error
+		else if ($tempRes == 0)
+		{
+			// pas de touche appuyée au bout du timeout
+			// --> relecture
+
+			$tempRes = agi_readDigit($timeout);
+
+			if ($max_replay <= 0) return -1;
+			$tempRes = agi_play_soundSet($soundSetId);
+			$max_replay--;
+
+			if ($tempRes == 0)
+				$tempRes = agi_readDigit($timout);
+
+			continue; // on reprend le parsing
+		}
+		else if ($tempRes == 10)
+			$tempRes = 0;
+		else if ($tempRes == "*") // replay
+		{
+			$tempRes = 0;	// force le timeout
+			continue;
+		}
+		else if ($tempRes == "#")
+		{
+			if ($ndigits >= $min)
+				return $result;
+			else
+			// force le timeout
+			{
+				$tempRes = 0;
+				continue;
+			}
+		}
+
+		// si nous sommes ici c'est que l'on a lu un chiffre correcte
+		// et qu'il se trouve dans tempRes : 
+		$ndigits++;
+		$result = $result*10 + $tempRes;
+
+		// on lance la lecture du nombre suivant : 
+		$tempRes = agi_readDigit($timout);
+	}
+	// nombre maximum de digit atteind :
+	return $result;
+}
+ 
 ?>
