@@ -11,6 +11,9 @@ function people_dial($extension, $callerId, $callerIdFull)
 		 "   and VoIPAccount.VoIPChannel_ID = VoIPChannel.ID ".
 		 "   and VoIPAccount.Enable = true ";
 	
+	$query = $db->query($query);
+	check_db();
+	
 	if ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED))
 	{
 		$dialStr = $row[0]."/".$row[1]."-".$row[2];
