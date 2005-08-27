@@ -4,8 +4,8 @@
 // du fichier de config
 conf_log(DEBUG_DEBUG, "Sip.conf...");
 
-$query = "Select AccountID, Name, FirstName, username, pwd, ".
-	 	"extension, canreinvite, host, port ".
+$query = "Select VoIPAccountID, Name, FirstName, username, pwd, ".
+	 	"VoIPAccount_People_Extension, canreinvite, host, port ".
 	 "from People, Sip ".
 	 "where extension = People_extension and enable = true";
 
@@ -16,7 +16,7 @@ while ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED))
 {
 	conf_log(DEBUG_DEBUG, '['.$row[3].'S'.$row[0].']');
 	
-	echo '['.$row[3].'S'.$row[0]."]\n";
+	echo '['.$row[3].'-'.$row[0]."]\n";
 	echo "context=obelisk-sip-pep\ntype=friend\n";
 	if (is_null($row[7]))
 		echo "host=dynamic\n";

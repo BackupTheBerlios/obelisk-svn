@@ -125,26 +125,39 @@ function agi_dial($extension, $callerId, $callerIdFull)
  *		error code )
  *
  * PRE: a line is writed on stdout
+ *	* $no_kill : if true: agi_check will not kill the script if asterisk 
+ *		return an error. This could be use for example in order to 
+ *		bill the start of the communication of dial an other number
  * POST: log error with agi_log(DEBuG_ERROR, ...);
  * RETURN: <0 : ERR
  * 	   >0 == result
  */
-function agi_check()
+function agi_check($no_kill = false)
 {
 	agi_log(DEBUG_DEBUG, "agi_check()");
 	
 	while($line = agi_read()) {
+		if ($line == "") {
+			// white line in asterisk output 
+			// --> error
+			if ($no_kill)
+				return -1;
+			else
+				agi_log(DEBUG_CRIT, 
+					"agi_check(): * output error");
+		}
 		$code = substr($line, 0, 4);
 		switch($code) {
 			case "200 ":
 				$a = explode("=", $line);
 
 				// Handle hangup
-				if (substr($a[1], 0, 2) == "-1") {
-					agi_log(DEBUG_CRIT, 
-					     "agi_check(): Hangup detected");
-					agi_terminate();
-				}
+				if (substr($a[1], 0, 2) == "-1") 
+					if ($no_kill)
+						return -1;
+					else
+						agi_log(DEBUG_CRIT, 
+					  "agi_check(): Hangup detected");
 
 				return $a[1];
 			case "510 ":
@@ -157,18 +170,25 @@ function agi_check()
 				agi_log(DEBUG_INF, "--- $line");
 		}
 	}
-	agi_log(DEBUG_CRIT, "agi_check(): there are something strange here");
+	
+	if ($no_kill)
+		return -1;
+	else
+		agi_log(DEBUG_CRIT, "agi_check(): there is something strange here");
 }
 
 /**
  * agi_write - write AGI command on $stdout
  * 
  * GLOBAL: $stdout - must be initialised to a correct value with fopen();
- * PRE: $agi - valid agi script
+ * PRE: $agi - valid agi script as a long string. (\n as line delimiter)
+ *	* $no_kill : if true: agi_check will not kill the script if asterisk 
+ *		return an error. This could be use for example in order to 
+ *		bill the start of the communication of dial an other number
  * I/O: stdout .= $agi
  * POST: wait for result and return the last result
  */
-function agi_write($agi)
+function agi_write($agi, $no_kill)
 {
 	global $stdout;
 	
@@ -186,7 +206,7 @@ function agi_write($agi)
 		fputs($stdout, $line."\n");
 		
 		// check the result
-		$result = agi_check();
+		$result = agi_check($no_kill);
 	}
 
 	return $result;

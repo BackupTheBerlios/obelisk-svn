@@ -23,4 +23,3 @@ Road map
 * dial : ajout du support des séquence (flag g de dial)
 * dial : gestion de la fin de l'appel
 * dial : gestion d'appel multiple sur une seule carte d'appel
-* people/dial.inc.php
