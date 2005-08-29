@@ -100,7 +100,7 @@ function agi_dial($extension, $callerId, $callerIdFull)
 		 " and Module_ID = Module.ID ";
 
 	$query = $db->query($query);
-	check_db();
+	check_db($query);
 
 	if ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED)) 
 	{
@@ -328,7 +328,7 @@ function agi_call($extension, $callStr, $callOptions,
 		 	"  from People_PrePay_Settings as P,  ".
 		 	" where People_Extension = $callerId ";
 	$query = $db->query($query);
-	check_db();
+	check_db($query);
 
 
 	if (!($row = $query->fetchRow(DB_FETCHMODE_ORDERED)))
@@ -347,7 +347,7 @@ function agi_call($extension, $callStr, $callOptions,
 		 	 "        (end is null and extension = $callerId))"
 		
 		$query = $db->query($query);
-		check_db();
+		check_db($query);
 		
 		if (!($row = $query->fetchRow(DB_FETCHMODE_ORDERED)))
 		{
@@ -419,7 +419,7 @@ function agi_logCall ($extension, $callerId, $account, $price, $time, $status)
 		 "$callerId, $extension, $price, $status)";
 	
 	$db->query($query);
-	check_db();
+	check_db($query);
 }
 
 /**
@@ -459,7 +459,7 @@ function agi_play($soundId, $dtmf = "0123456789#*");
 	$query = "Select Filename from AgiSound where ID=$soundId";
 
 	$query = $db->query($query);
-	check_db();
+	check_db($query);
 	
 	if (!($row = $query->fetchRow(DB_FETCHMODE_ORDERED))
 		return -1;
@@ -511,7 +511,7 @@ function agi_play_soundSet($soundSetId, $dtmf = "0123456789*#")
 		 "order by Priority";
 	
 	$query = $db->query($query);
-	check_db();
+	check_db($query);
 
 	unset($result);
 	while ($row = $query->fetchRow(DB_FETCHMODE_ORDERED))

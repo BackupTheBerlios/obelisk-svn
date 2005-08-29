@@ -1,6 +1,6 @@
 <?php
 
-include ('conf_util.php');
+include ('conf_util.inc.php');
 
 // téléchargement dans la base de données des comptes SIP + reconstitution
 // du fichier de config
@@ -11,13 +11,13 @@ conf_log(DEBUG_DEBUG, "Sip.conf...");
 
 if (!USE_SER)
 {
-	$query = "Select VoIPAccountID, Name, FirstName, username, pwd, ".
+	$query = "Select VoIPAccount_ID, Name, FirstName, username, pwd, ".
 			"VoIPAccount_People_Extension, canreinvite, host, port ".
 		 "from People, Sip ".
-		 "where extension = People_extension and enable = true";
+		 "where extension = VoIPAccount_People_extension and enable = true";
 
 	$query = $db->query($query);
-	check_db();
+	check_db($query);
 
 	while ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED)) 
 	{
@@ -33,7 +33,7 @@ if (!USE_SER)
 			if (!is_null($row[8]))
 				echo "port=".$row[8]."\n";
 		}
-		echo 'callerid='.$row[2].' '.$row[1].' <'.$row[3]."> \n";
+		echo 'callerid='.$row[2].' '.$row[1].' <'.$row[5]."> \n";
 		echo 'canreinvite='.($row[6] ? "yes\n" : "no\n");
 		echo 'secret='.$row[4]."\n\n";
 	}
@@ -51,6 +51,7 @@ canreinvite=yes
 	
 	conf_log(DEBUG_CRIT, "not yet supported");
 	
-	conf_log(DEBUG_INF, "DONE");
+}
+	conf_log(DEBUG_INFO, "DONE");
 
 ?>

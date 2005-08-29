@@ -1,18 +1,18 @@
 <?php
 
-include ('conf_util.php');
+include ('conf_util.inc.php');
 
 // téléchargement dans la base de donnÃ©es des comptes SIP + reconstitution
 // du fichier de config
 conf_log(DEBUG_DEBUG, "Iax.conf...");
 
-$query = "Select VoIPAccountID, Name, FirstName, username, pwd, ".
+$query = "Select VoIPAccount_ID, Name, FirstName, username, pwd, ".
 	 	"VoIPAccount_People_Extension, notransfer, host, port ".
 	 "from People, Iax ".
-	 "where extension = People_extension and enable = true";
+	 "where extension = VoIPAccount_People_extension and enable = true";
 
 $query = $db->query($query);
-check_db();
+check_db($query);
 
 while ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED)) 
 {
@@ -34,6 +34,6 @@ while ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED))
 	echo 'secret='.$row[4]."\n\n";
 }
 
-conf_log(DEBUG_INF, "DONE");
+conf_log(DEBUG_INFO, "DONE");
 
 ?>

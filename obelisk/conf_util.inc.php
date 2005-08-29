@@ -16,13 +16,13 @@ $stderr = fopen("php://stderr", "w");
 function conf_log($level, $msg)
 {
 	global $stderr;
-
+	
 	if ($level &  DEBUG_LEVEL)
 		fputs($stderr, $msg);
 	
 	if ($level == 0)
 	{
-		agi_terminate(-1);
+		exit(-1);
 	}
 }
 
