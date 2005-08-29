@@ -1,7 +1,10 @@
 in order to install a module:
 
-1°) edit module_name/init.sql
+1°) edit module_name/init.sql if present
 2°) import module_name/init.sql into your database
-3°) copy or link module_name into /usr/share/obelisk/module or the forlder 
-	you copied obelisk
+3°) copy or link module_name into /usr/share/obelisk/module or the place where
+	you installed obelisk
 4°) enjoy
+
+note : some module could have a DEPENDS file, this file list each module you 
+	have to install BEFORE the installation of the module

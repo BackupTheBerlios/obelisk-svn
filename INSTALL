@@ -7,7 +7,15 @@
 4) copy obelisk folder where you want (/usr/share/obelisk) for example
 5) edit /usr/share/obelisk/config.inc.php (link it to /etc/obelisk.conf if you 
 	prefer)
-6) install modules (module folder)
-7) copy WebMenu.php from the sample folder where you want and 
-	define the menu ID
-8) enjoy
+6) generate your sip and iax.conf using script (not the utilisation of obelisk
+	without ser is not yet tested)
+7) include them after the global or general section in asterisk using #include
+8) the script conf_gen-ser.cfg.php give you on stdout some lines to put in your
+	ser.cfg if you use ser. This script doesn't give you a correct ser.cfg.
+	This script give you also some sql query to run manualy on your server 
+	in order to add some view for authentivation in the ser server. 
+	It's probably better to create a new database user for ser.
+9) install modules (modules/HOWTO_INSTALL)
+//10) copy WebMenu.php from the sample folder where you want and 
+//	define the menu ID
+11) enjoy
