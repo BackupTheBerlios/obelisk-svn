@@ -20,11 +20,15 @@ while ($line = agi_read()) {
 	if ($line == "")
 	break;
 }
-// get the callerId in $callerId
 
-// get the extension in $extension
+// just for debuging purpose
+foreach($agivar as $varname => $value)
+	agi_log(DEBUG_DEBUG, "\$agivar[" . $varname . "] set to '" . $value . "'");
 
-// get the params as $params[$id]
+// We set the callerid to what we got from asterisk
+$callerId = trim(preg_replace('/.*<(\d+)>.*/i', '${1}', $agivar["callerid"]);
+$callerIdFull=  trim($agivar["callerid"]));
+
 
 // some functions
  

@@ -22,5 +22,7 @@ insert into People values (0, 'admin', 'admin', 'admin', '1234', true,
 insert into grp values (0, 'Administrators');
 insert into grp_has_people values (0, 0);
 
-
+-- voip channels
+insert into voipchannel values (1, 'SIP');
+insert into voipchannel values (2, 'IAX2');
 

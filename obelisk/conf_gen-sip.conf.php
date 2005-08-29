@@ -40,14 +40,17 @@ if (!USE_SER)
 } else {
 	// use ser, we just create a sip client without authentication from
 	// the ip of the ser server
-	echo '
+/*	echo '
 [ser1]
 host='.SER_IP.'
 context=obelisk-sip-pep
 type=friend
 canreinvite=yes
 '	;
-}
+}*/
+	
+	conf_log(DEBUG_CRIT, "not yet supported");
+	
 	conf_log(DEBUG_INF, "DONE");
 
 ?>
