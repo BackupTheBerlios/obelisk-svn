@@ -2,6 +2,8 @@
 
 include_once('common.inc.php');
 
+$stderr = fopen("php://stderr", "w");
+
 /**
  * agi_log - write some debug information on stderr
  *
@@ -13,7 +15,7 @@ include_once('common.inc.php');
  */
 function conf_log($level, $msg)
 {
-	$stderr = fopen("php://stderr", "w");
+	global $stderr;
 
 	if ($level &  DEBUG_LEVEL)
 		fputs($stderr, $msg);
