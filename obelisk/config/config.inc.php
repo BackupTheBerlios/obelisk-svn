@@ -17,4 +17,12 @@ $dsn = "protocol://user:pass@host/dbname";
 DEFINE('DEFAULT_EXTENSION', 0);
 DEFINE('NOT_ENOUGH_MONEY', '1'); // NOT YET IMPLEMENTED
 DEFINE('END_OF_MONEY', 2);	 // NOT YET IMPLEMENTED
+
+// if you use ser before your asterisk server set USE_SER to true and SER_IP
+// to the ip of the ser serveur.
+// obelisk is at the present time only tested with ser
+DEFINE('USE_SER', true);
+DEFINE('SER_IP', '192.168.3.57');
+DEFINE('ASTERISK_SIP_PORT', 5061); 
+DEFINE('ASTERISK_IP', '192.168.3.57');
 ?>
