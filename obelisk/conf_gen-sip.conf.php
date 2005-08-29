@@ -1,5 +1,7 @@
 <?php
 
+include ('conf_util.php');
+
 // téléchargement dans la base de données des comptes SIP + reconstitution
 // du fichier de config
 

@@ -1,6 +1,8 @@
 <?php
 
-// téléchargement dans la base de données des comptes SIP + reconstitution
+include ('conf_util.php');
+
+// t�l�chargement dans la base de données des comptes SIP + reconstitution
 // du fichier de config
 conf_log(DEBUG_DEBUG, "Iax.conf...");
 
