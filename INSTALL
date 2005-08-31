@@ -9,7 +9,6 @@
 	prefer)
 6) generate your sip and iax.conf using script 
 7) include them after the global or general section in asterisk using #include
-8) install modules (modules/HOWTO_INSTALL)
 //9) copy WebMenu.php from the sample folder where you want and 
 //	define the menu ID
 10) enjoy
