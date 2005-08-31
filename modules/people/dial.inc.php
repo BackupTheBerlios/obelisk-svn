@@ -12,9 +12,9 @@ function people_dial($extension, $callerId, $callerIdFull)
 		 "   and VoIPAccount.Enable = true ";
 	
 	$query = $db->query($query);
-	check_db();
+	check_db($query);
 	
-	if ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED))
+	if ($row = $query->fetchRow(DB_FETCHMODE_ORDERED))
 	{
 		$dialStr = $row[0]."/".$row[1]."-".$row[2];
 

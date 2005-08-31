@@ -1,24 +1,32 @@
 <?
 
-include_once('common.inc.php');
-
 // some initialisation of the script 
 $stdin = fopen("php://stdin", "r");
 $stdout = fopen("php://stdout", "w");
+
+// now we record headers lines in $buffer before sending anything on stdout
+$buffer = array();
+while ($bufferTemp = trim(fgets($stdin, 4096)))
+{
+	if ($bufferTemp == "")
+		break;
+	array_push($buffer, $bufferTemp);
+}
+
+// now let's go...
+include_once('common.inc.php');
 
 set_time_limit(0); // allow menu execution
 set_error_handler("agi_error_handler"); // internal error handler
 
 // Fetch parameters
-while ($line = agi_read()) {
+foreach ($buffer as $line) {
 	$a = explode(":", $line);
 	$varname = str_replace("agi_", "", $a[0]);
 	$value = trim($a[1]);
 	$agivar[$varname] = $value;
-	agi_log(DEBUG_INFO, 
-		"\$agivar[" . $varname . "] set to '" . $value . "'");
 	if ($line == "")
-	break;
+		break;
 }
 
 // just for debuging purpose
@@ -26,9 +34,11 @@ foreach($agivar as $varname => $value)
 	agi_log(DEBUG_DEBUG, "\$agivar[" . $varname . "] set to '" . $value . "'");
 
 // We set the callerid to what we got from asterisk
-$callerId = trim(preg_replace('/.*<(\d+)>.*/i', '${1}', $agivar["callerid"]);
-$callerIdFull=  trim($agivar["callerid"]));
+$callerId = trim(preg_replace('/.*<(\d+)>.*/i', '${1}', $agivar["callerid"]));
+$callerIdFull = $agivar["callerid"];
 
+// the extension 
+$extension = $agivar["extension"];
 
 // some functions
  
@@ -59,14 +69,25 @@ function agi_terminate($return_code)
  */
 function agi_log($level, $msg)
 {
-	if ($level &  DEBUG_LEVEL)
+	static $agi_log_lock; // this variable is set when this function report
+			      // somthing. It's used only by this function in 
+			      // oerder to prevent agi_write to report 
+			      // something using agi_log and create a stack
+			      // overflow
+
+	if ($agi_log_lock)	return;
+	
+	$agi_log_lock = true;
+	if ($level <=  DEBUG_LEVEL)
 		agi_write("VERBOSE \"".str_replace("\"", "\\\"", $msg)."\" ".
-			$level == 0 ? "1" : "0";
+			($level == 0 ? "1" : $level));
 	
 	if ($level == 0)
 	{
 		agi_terminate(-1);
 	}
+
+	$agi_log_lock = false;
 }
 
 /**
@@ -90,21 +111,22 @@ function agi_dial($extension, $callerId, $callerIdFull)
 {
 	global $db;
 	
-	agi_log(DEBUG_DEBUG, "obelisk_dial($extension, $isBot)");
+	agi_log(DEBUG_DEBUG, "agi_dial($extension, $callerId, ".
+					"$callerIdFull)");
 
 	$query = "Select name ".
 		 "from Extension, Module ".
-		 "where ((end is not null and extension <= $extension ".
-		 "  and end >= $extension) or ".
-		 " (end is null and extension = $extension))".
+		 "where ((ext_end is not null and extension <= $extension ".
+		 "  and ext_end >= $extension) or ".
+		 " (ext_end is null and extension = $extension))".
 		 " and Module_ID = Module.ID ";
 
 	$query = $db->query($query);
 	check_db($query);
-
-	if ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED)) 
+	
+	if ($row = $query->fetchRow(DB_FETCHMODE_ORDERED)) 
 	{
-		agi_log(DEBUG_DEBUG, "agi_obelisk.php: extension ".
+		agi_log(DEBUG_INFO, "agi_dial(): extension ".
 			$extension." is handeled by : ".$row[0]);
 		
 		// on tente d'inclure le dial du module en question
@@ -193,14 +215,14 @@ function agi_check($no_kill = false)
  * I/O: stdout .= $agi
  * POST: wait for result and return the last result (use agi_check)
  */
-function agi_write($agi, $no_kill)
+function agi_write($agi, $no_kill = false)
 {
 	global $stdout;
 	
 	agi_log(DEBUG_DEBUG, "obelisk_write($agi)");
 
 	$agi = explode("\n", $agi); // explode lines
-	
+
 	// for each line in $agi
 	foreach ($agi as $line)
 	{
@@ -228,11 +250,9 @@ function agi_read()
 {
 	global $stdin;
 		
-	agi_log(DEBUG_DEBUG, "agi_read()");
-		
 	$input = str_replace("\n", "", fgets($stdin, 4096));
 	
-	agi_log(DEBUG_INF, "agi_read() : \"$input\"");
+	agi_log(DEBUG_INFO, "agi_read() : \"$input\"");
 	
 	return $input;
 }
@@ -244,7 +264,7 @@ function agi_getVar($varname)
 {
 	$result = agi_write("GET VARIABLE \"".$varname."\"");
 	$result = preg_replace('/.*\((.*)\).*/i', '${1}', $result);
-	agi_log(DEBUG-DEBUG, "agi_getVar '".$varname."' = '".$variable . "'");
+	agi_log(DEBUG_DEBUG, "agi_getVar '".$varname."' = '".$variable . "'");
 	return $result;
 }
 
@@ -269,7 +289,7 @@ function agi_error_handler($errno, $errstr, $errfile, $errline)
 			break;
 		default:
 			agi_log(DEBUG_ERR, "Unkown error type: [".$errno."] ".
-						$errstr);
+					$errstr." in ".$errfile.":".$errline);
 			break;
 	}
 }
@@ -282,13 +302,13 @@ function agi_notFound($extension, $callerId, $callerIdFull)
 	// impossible de trouver l'extension par dÃ©faut
 		agi_log(DEBUG_CRIT, 
 				"agi_obelisk.php: DEFAULT EXTENSION NOT FOUND");
-		else 
-		{
-			agi_log(DEBUG_INFO, "agi_obelisk.php: NOT FOUND -> ".
-				"switching to default extension");
-			agi_dial(DEFAULT_EXTENSION, $callerId, $callerIdFull);
-		}
+	else 
+	{
+		agi_log(DEBUG_INFO, "agi_obelisk.php: NOT FOUND -> ".
+			"switching to default extension");
+		agi_dial(DEFAULT_EXTENSION, $callerId, $callerIdFull);
 	}
+
 }
 
 /**
@@ -300,8 +320,8 @@ function agi_notFound($extension, $callerId, $callerIdFull)
  *	 * $extension: only use for logging purpose
  *	 * $callStr, destination for Dial application of asterisk
  *	 * $callOptions << !!!!!!!!!! USE THIS WITH CARE !!!!!!!!
- *	 * $priceConn connection price
- *	 * $price the price/minutes of the call
+ *	 * $priceConn connection price >= 0
+ *	 * $price the price/minutes of the call >= 0
  * 	 * $callerId a the callerId (only the number)
  *	 * $callerIdFull : full callerId
  *
@@ -320,12 +340,12 @@ function agi_call($extension, $callStr, $callOptions,
 {
 	global $db;
 	
-	agi_log(DEBUG_DEBUG, "agi_call : $callSer, $priceConn, ".
+	agi_log(DEBUG_DEBUG, "agi_call : $callStr, $priceConn, ".
 				"$price, $callerId, $callerIdFull");
 	
 	// first I check if the callerId is a valid person in the database
 	$query = 	"select P.Credit, P.Announce, P.AskHigherCost ".
-		 	"  from People_PrePay_Settings as P,  ".
+		 	"  from People_PrePay_Settings as P  ".
 		 	" where People_Extension = $callerId ";
 	$query = $db->query($query);
 	check_db($query);
@@ -333,18 +353,18 @@ function agi_call($extension, $callStr, $callOptions,
 
 	if (!($row = $query->fetchRow(DB_FETCHMODE_ORDERED)))
 	{
-		// aucune personne trouvÃ©e dans la base de donnÃ©e avec 
+		// aucune personne trouvée dans la base de donnée avec 
 		// le callerId $callerId --> recherche de la personne 
-		// responsable et vÃ©rification si elle accepte d'Ãªtre 
-		// facturÃ©e pour quelqu'un d'autre...
+		// responsable et vérification si elle accepte d'être 
+		// facturée pour quelqu'un d'autre...
 		$query = "select P.Credit, P.Announce, P.AskHigherCost, ".
-			 "	P.Responsable_Extension ".
+			 "	E.Responsable_Extension ".
 			 "  from People_PrePay_Settings as P, Extension as E ".
 			 " where P.People_Extension = E.Responsable_Extension ".
 			 "   and P.AllowOtherCID = true ".
-			 "   and ((end is not null and extension<=$callerId".
-			 "         and end >= $callerId) or ".
-		 	 "        (end is null and extension = $callerId))"
+			 "   and ((ext_end is not null and extension<=$callerId".
+			 "         and ext_end >= $callerId) or ".
+		 	 "        (ext_end is null and extension = $callerId))";
 		
 		$query = $db->query($query);
 		check_db($query);
@@ -384,9 +404,13 @@ function agi_call($extension, $callStr, $callOptions,
 		return agi_dial(NOT_ENOUGH_MONEY, $callerId, $callerIdFull);
 	
 	// bon on a assez de soux que pour faire l'appel.... on dial
-	$maxSec = ($credit-$priceConn)/$price*60;
-	agi_write("EXEC DIAL ${callStr}||${callOptions}L(${maxSec})");
-	
+	if ($price == 0)
+		agi_write("EXEC DIAL ${callStr}||${callOptions}");
+	else
+	{
+		$maxSec = ($credit-$priceConn)/$price*60;
+		agi_write("EXEC DIAL ${callStr}||${callOptions}L(${maxSec})");
+	}
 	$answeredTime = agi_getVar("ANSWEREDTIME");
 	$dialStatus = agi_getVar("DIALSTATUS");
 
@@ -396,7 +420,7 @@ function agi_call($extension, $callStr, $callOptions,
 	$total = $priceConn + ceil($answeredTime/60);
 	if ($dialStatus == "ANSWER")
 	{
-		agi_credit($account, -($total);
+		agi_credit($account, -($total));
 		agi_logCall($extension, $callerId, $account, 
 			    $price, $answeredTime, $dialStatus);
 	}
@@ -433,7 +457,7 @@ function agi_credit($account, $modification)
 	agi_log(DEBUG_DEBUG, "agi_credit: $account + ($modification) ");
 	
 	$query = "update People_PrePay_Settings ".
-	         "set credit = credit + (${modification}) "
+	         "set credit = credit + (${modification}) ".
 		 "where People_Extension = $callerId ";
 	
 	$db->query($query);
@@ -454,14 +478,14 @@ function agi_credit($account, $modification)
  *		 0 : if the song is correctly played and not stopped
  *		 a dtmf (0 is return as 10, # as '#' and * as '*'
  */
-function agi_play($soundId, $dtmf = "0123456789#*");
+function agi_play($soundId, $dtmf = "0123456789#*")
 {
 	$query = "Select Filename from AgiSound where ID=$soundId";
 
 	$query = $db->query($query);
 	check_db($query);
 	
-	if (!($row = $query->fetchRow(DB_FETCHMODE_ORDERED))
+	if (!($row = $query->fetchRow(DB_FETCHMODE_ORDERED)))
 		return -1;
 	
 	$result = agi_write("STREAM FILE \"".$row[0]."\" \"${dtmf}\"", true);

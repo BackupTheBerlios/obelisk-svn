@@ -2,6 +2,8 @@
 
 include('config/config.inc.php');
 
+ini_set('include_path', '.'.PATH_SEPARATOR.PEAR_PATH.PATH_SEPARATOR.AGI_PATH);
+
 require_once('DB.php'); // PEAR DB
 
 // DEBUG_LEVEL
