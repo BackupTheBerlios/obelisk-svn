@@ -107,7 +107,7 @@ CREATE TABLE AgiLog (
   Responsable_Extension extension_type NULL,
   LogWhen DATETIME NOT NULL DEFAULT 'now()',
   CallerId VARCHAR(64) NOT NULL,
-  Extension BIGINT NOT NULL,
+  Extension extension_type NOT NULL,
   Price INTEGER UNSIGNED NOT NULL,
   Duration INTEGER UNSIGNED NOT NULL,
   CallStatus VARCHAR(15) NOT NULL,
@@ -121,7 +121,7 @@ CREATE TABLE AgiLog (
 
 CREATE TABLE Module_Action (
   Module_ID INTEGER UNSIGNED NOT NULL,
-  Action_ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  Action_ID INTEGER UNSIGNED NOT NULL,
   Name VARCHAR(20) NULL,
   Description TEXT NULL,
   PRIMARY KEY(Module_ID, Action_ID),
@@ -148,7 +148,6 @@ CREATE TABLE Rights (
   Grp_ID INTEGER UNSIGNED NOT NULL,
   Module_Action_ID INTEGER UNSIGNED NOT NULL,
   Module_ID INTEGER UNSIGNED NOT NULL,
-  Value BOOL NOT NULL,
   PRIMARY KEY(Grp_ID, Module_Action_ID, Module_ID),
   INDEX Rights_FKIndex1(Grp_ID),
   INDEX Right_FKIndex2(Module_ID, Module_Action_ID),
@@ -241,6 +240,7 @@ CREATE TABLE Geographical_alias (
   PRIMARY KEY(Extension, Geographical_Group_Extension),
   INDEX Geographical_alias_FKIndex1(Geographical_Group_Extension),
   INDEX Geographical_alias_FKIndex2(People_Extension),
+  UNIQUE INDEX Geographical_alias_uniqPepGrp(People_Extension, Geographical_Group_Extension),
   FOREIGN KEY(People_Extension)
     REFERENCES People(Extension)
       ON DELETE CASCADE
