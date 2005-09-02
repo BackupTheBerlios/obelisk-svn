@@ -18,7 +18,7 @@ function conf_log($level, $msg)
 	global $stderr;
 	
 	if ($level &  DEBUG_LEVEL)
-		fputs($stderr, $msg);
+		fputs($stderr, $msg."\n");
 	
 	if ($level == 0)
 	{

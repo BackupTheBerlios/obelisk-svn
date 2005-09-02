@@ -28,11 +28,11 @@ insert into extension values ('00000', NULL, 3, '99999999999999999999');
 insert into grp values (0, 'Everyone');
 
 -- one administrator (set your password here an integer value)
-insert into People values ('00000', 'admin', 'admin', 'admin', '1234', true, 
+insert into People values ('0000', 'admin', 'admin', 'admin', '1234', true, 
 				'asterisk@localhost');
 insert into grp values (1, 'Administrators');
-insert into grp_has_people values (0, 1);
-insert into grp_has_people values (0, 0);
+insert into grp_has_people values (1, '0000');
+insert into grp_has_people values (0, '0000');
 
 -- voip channels
 insert into voipchannel values (1, 'SIP');

@@ -1,3 +1,5 @@
+#!/usr/bin/php
+
 <?php
 
 include ('conf_util.inc.php');
@@ -20,7 +22,7 @@ while ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED))
 	
 	echo '['.$row[3].'-'.$row[0]."]\n";
 	echo "context=obelisk-iax-pep\ntype=friend\n";
-	echo 'username='.$row[3].'I'.$row[0]."\n";
+	echo 'username='.$row[3].'-'.$row[0]."\n";
 	if (is_null($row[7]))
 		echo "host=dynamic\n";
 	else

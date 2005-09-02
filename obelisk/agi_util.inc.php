@@ -19,6 +19,7 @@ include_once('common.inc.php');
 set_time_limit(0); // allow menu execution
 set_error_handler("agi_error_handler"); // internal error handler
 
+// now let's go...
 // Fetch parameters
 foreach ($buffer as $line) {
 	$a = explode(":", $line);
@@ -29,6 +30,7 @@ foreach ($buffer as $line) {
 		break;
 }
 
+// now let's go...
 // just for debuging purpose
 foreach($agivar as $varname => $value)
 	agi_log(DEBUG_DEBUG, "\$agivar[" . $varname . "] set to '" . $value . "'");
@@ -40,6 +42,7 @@ $callerIdFull = $agivar["callerid"];
 // the extension 
 $extension = $agivar["extension"];
 
+// now let's go...
 // some functions
  
 /**
@@ -252,7 +255,7 @@ function agi_read()
 		
 	$input = str_replace("\n", "", fgets($stdin, 4096));
 	
-	agi_log(DEBUG_INFO, "agi_read() : \"$input\"");
+	agi_log(DEBUG_DEBUG, "agi_read() : \"$input\"");
 	
 	return $input;
 }
@@ -264,7 +267,7 @@ function agi_getVar($varname)
 {
 	$result = agi_write("GET VARIABLE \"".$varname."\"");
 	$result = preg_replace('/.*\((.*)\).*/i', '${1}', $result);
-	agi_log(DEBUG_DEBUG, "agi_getVar '".$varname."' = '".$variable . "'");
+	agi_log(DEBUG_DEBUG, "agi_getVar '".$varname."' = '".$result. "'");
 	return $result;
 }
 
@@ -369,20 +372,19 @@ function agi_call($extension, $callStr, $callOptions,
 		$query = $db->query($query);
 		check_db($query);
 		
-		if (!($row = $query->fetchRow(DB_FETCHMODE_ORDERED)))
+		if (($row = $query->fetchRow(DB_FETCHMODE_ORDERED)))
 		{
 			$found = true;
 			$account = $row[3];
 			$credit = $row[0];
 			$announce = $row[1]; 
 			$ask = $row[2];
-
 		}
 		else
 		{
 			// introuvable
 			$found = false;
-			$accont = ""; 
+			$account = "NULL"; 
 			$credit = 0; 
 			$announce = false; 
 			$ask = false;
@@ -390,14 +392,14 @@ function agi_call($extension, $callStr, $callOptions,
 	}
 	else
 	{
-		// le callerId appartient Ã  une personne de mÃªme extension
+		// le callerId appartient à une personne de même extension
 		$found = true;
 		$account = $callerId;
 		$credit = $row[0];
 		$announce = $row[1]; 
 		$ask = $row[2];
 	}
-
+	
 	if (($price + $priceConn) > $credit )
 		// pas assez de crÃ©dit d'appel pour effectuer l'appel en 
 		// question
@@ -405,15 +407,17 @@ function agi_call($extension, $callStr, $callOptions,
 	
 	// bon on a assez de soux que pour faire l'appel.... on dial
 	if ($price == 0)
-		agi_write("EXEC DIAL ${callStr}||${callOptions}");
+		agi_write("EXEC DIAL ${callStr}||${callOptions}",true);
 	else
 	{
 		$maxSec = ($credit-$priceConn)/$price*60;
 		agi_write("EXEC DIAL ${callStr}||${callOptions}L(${maxSec})");
 	}
+	usleep(1);
 	$answeredTime = agi_getVar("ANSWEREDTIME");
+	usleep(1);
 	$dialStatus = agi_getVar("DIALSTATUS");
-
+	usleep(1);
 	agi_log(DEBUG_INFO, "agi_dial : $extension -> $callStr ".
 				": $dialStatus : $answeredTime");
 	
@@ -421,9 +425,10 @@ function agi_call($extension, $callStr, $callOptions,
 	if ($dialStatus == "ANSWER")
 	{
 		agi_credit($account, -($total));
-		agi_logCall($extension, $callerId, $account, 
-			    $price, $answeredTime, $dialStatus);
 	}
+
+	agi_logCall($extension, $account, $callerId, $account, 
+		    $price, $answeredTime, $dialStatus);
 
 	return $total;
 }
@@ -432,16 +437,16 @@ function agi_call($extension, $callStr, $callOptions,
  * agi_logCall - log a call into the database
  *
  */
-function agi_logCall ($extension, $callerId, $account, $price, $time, $status)
+function agi_logCall ($extension, $account, $callerId, $account, $price, $time, $status)
 {
 	global $db;
 	
-	agi_log(DEBUG_INF, "agi_logCall : $extension, $callerId, $account, ".
+	agi_log(DEBUG_INFO, "agi_logCall : $extension, $callerId, $account, ".
 				"$price, $time, $status");
 				
-	$query = "insert into AgiLog values (DEFAULT, now(), ".
-		 "$callerId, $extension, $price, $status)";
-	
+	$query = "insert into AgiLog values (DEFAULT, $account, now(), ".
+		 "$callerId, $extension, $price, $time, '$status')";
+
 	$db->query($query);
 	check_db($query);
 }
@@ -453,8 +458,6 @@ function agi_logCall ($extension, $callerId, $account, $price, $time, $status)
 function agi_credit($account, $modification)
 {
 	global $db;
-	
-	agi_log(DEBUG_DEBUG, "agi_credit: $account + ($modification) ");
 	
 	$query = "update People_PrePay_Settings ".
 	         "set credit = credit + (${modification}) ".

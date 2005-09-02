@@ -20,7 +20,8 @@ DEFINE('END_OF_MONEY', 2);	 // NOT YET IMPLEMENTED
 
 
 // debug level (see common.inc.php for more informations)
-DEFINE('DEBUG_LEVEL', 4);
+DEFINE('DEBUG_LEVEL', 3); // 4 produce a lot of debug and seems to crash 
+			  // asterisk some times
 
 // if you use ser before your asterisk server set USE_SER to true and SER_IP
 // to the ip of the ser serveur.

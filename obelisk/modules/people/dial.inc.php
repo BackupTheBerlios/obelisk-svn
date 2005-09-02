@@ -20,7 +20,7 @@ function people_dial($extension, $callerId, $callerIdFull)
 
 		while ($row = $query->fetchRow(DB_FETCHMODE_ORDERED))
 		{
-			$dialStr .= ",";
+			$dialStr .= "&";
 			$dialStr .= $row[0]."/".$row[1]."-".$row[2];
 		}
 

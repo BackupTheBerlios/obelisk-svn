@@ -1,3 +1,5 @@
+#!/usr/bin/php
+
 <?php
 
 include ('conf_util.inc.php');
@@ -12,7 +14,8 @@ conf_log(DEBUG_DEBUG, "Sip.conf...");
 if (!USE_SER)
 {
 	$query = "Select VoIPAccount_ID, Name, FirstName, username, pwd, ".
-			"VoIPAccount_People_Extension, canreinvite, host, port ".
+			"VoIPAccount_People_Extension, canreinvite, host, ".
+			"port, DtmfMode ".
 		 "from People, Sip ".
 		 "where extension = VoIPAccount_People_extension and enable = true";
 
@@ -21,7 +24,7 @@ if (!USE_SER)
 
 	while ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED)) 
 	{
-		conf_log(DEBUG_DEBUG, '['.$row[3].'S'.$row[0].']');
+		conf_log(DEBUG_DEBUG, '['.$row[3].'-'.$row[0].']');
 		
 		echo '['.$row[3].'-'.$row[0]."]\n";
 		echo "context=obelisk-sip-pep\ntype=friend\n";
@@ -35,7 +38,10 @@ if (!USE_SER)
 		}
 		echo 'callerid='.$row[2].' '.$row[1].' <'.$row[5]."> \n";
 		echo 'canreinvite='.($row[6] ? "yes\n" : "no\n");
-		echo 'secret='.$row[4]."\n\n";
+		echo 'secret='.$row[4]."\n";
+		echo 'dtmfmode='.($row[9] == 1 ? "inband" : 
+					($row[9] == 2 ? "rfc2833" : "info")).
+					"\n\n";
 	}
 } else {
 	// use ser, we just create a sip client without authentication from
