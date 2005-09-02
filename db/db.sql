@@ -26,7 +26,7 @@ CREATE TABLE Network (
 
 CREATE TABLE VoIPChannel (
   ID SMALLINT UNSIGNED NOT NULL,
-  ChanType CHAR(3) NOT NULL,
+  ChanType VARCHAR(4) NOT NULL,
   PRIMARY KEY(ID),
   UNIQUE INDEX Account_Channel_UNIQ_CT(ChanType)
 );
@@ -40,7 +40,7 @@ CREATE TABLE WebInterface (
 );
 
 CREATE TABLE People (
-  Extension INTEGER UNSIGNED NOT NULL,
+  Extension extension_type NOT NULL,
   username VARCHAR(32) NOT NULL,
   Name VARCHAR(48) NOT NULL,
   FirstName VARCHAR(48) NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE People (
 );
 
 CREATE TABLE Raw_Extension (
-  Extension INTEGER UNSIGNED NOT NULL,
+  Extension extension_type NOT NULL,
   price DECIMAL(5,4) NOT NULL,
   agi VARCHAR(512) NOT NULL,
   PRIMARY KEY(Extension)
@@ -65,9 +65,8 @@ CREATE TABLE Grp (
 );
 
 CREATE TABLE Geographical_Group (
-  Extension INTEGER UNSIGNED NOT NULL,
+  Extension extension_type NOT NULL,
   Name VARCHAR(32) NOT NULL,
-  Len SMALLINT UNSIGNED NOT NULL,
   PRIMARY KEY(Extension)
 );
 
@@ -78,7 +77,7 @@ CREATE TABLE AgiSound (
 );
 
 CREATE TABLE People_PrePay_Settings (
-  People_Extension INTEGER UNSIGNED NOT NULL,
+  People_Extension extension_type NOT NULL,
   Credit DECIMAL(8,4) NOT NULL DEFAULT '0',
   Announce DECIMAL(1) NOT NULL DEFAULT '1',
   AskHigherCost BOOL NOT NULL,
@@ -105,7 +104,7 @@ CREATE TABLE AgiSound_Set (
 
 CREATE TABLE AgiLog (
   ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  Responsable_Extension INTEGER UNSIGNED NOT NULL,
+  Responsable_Extension extension_type NULL,
   LogWhen DATETIME NOT NULL DEFAULT 'now()',
   CallerId VARCHAR(64) NOT NULL,
   Extension BIGINT NOT NULL,
@@ -184,7 +183,7 @@ CREATE TABLE AgiInterface (
 );
 
 CREATE TABLE VoIPAccount (
-  People_Extension INTEGER UNSIGNED NOT NULL,
+  People_Extension extension_type NOT NULL,
   ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   VoIPChannel_ID SMALLINT UNSIGNED NOT NULL,
   Enable BOOL NOT NULL,
@@ -203,7 +202,7 @@ CREATE TABLE VoIPAccount (
 
 CREATE TABLE Grp_has_People (
   Grp_ID INTEGER UNSIGNED NOT NULL,
-  People_Extension INTEGER UNSIGNED NOT NULL,
+  People_Extension extension_type NOT NULL,
   PRIMARY KEY(Grp_ID, People_Extension),
   INDEX Groups_has_Peoples_FKIndex1(Grp_ID),
   INDEX Grp_has_People_FKIndex2(People_Extension),
@@ -218,10 +217,10 @@ CREATE TABLE Grp_has_People (
 );
 
 CREATE TABLE Extension (
-  Extension BIGINT NOT NULL AUTO_INCREMENT,
-  Responsable_Extension INTEGER UNSIGNED NULL,
+  Extension extension_type NOT NULL AUTO_INCREMENT,
+  Responsable_Extension extension_type NULL,
   Module_ID INTEGER UNSIGNED NOT NULL,
-  ext_end BIGINT NULL,
+  ext_end extension_type NULL,
   PRIMARY KEY(Extension),
   INDEX extension_FKIndex1(Module_ID),
   INDEX Extension_FKIndex2(Responsable_Extension),
@@ -236,9 +235,9 @@ CREATE TABLE Extension (
 );
 
 CREATE TABLE Geographical_alias (
-  Extension SMALLINT UNSIGNED NOT NULL,
-  Geographical_Group_Extension INTEGER UNSIGNED NOT NULL,
-  People_Extension INTEGER UNSIGNED NOT NULL,
+  Extension extension_type NOT NULL,
+  Geographical_Group_Extension extension_type NOT NULL,
+  People_Extension extension_type NOT NULL,
   PRIMARY KEY(Extension, Geographical_Group_Extension),
   INDEX Geographical_alias_FKIndex1(Geographical_Group_Extension),
   INDEX Geographical_alias_FKIndex2(People_Extension),
@@ -353,7 +352,7 @@ CREATE TABLE AgiMenu (
 
 CREATE TABLE Sip (
   VoIPAccount_ID INTEGER UNSIGNED NOT NULL,
-  VoIPAccount_People_Extension INTEGER UNSIGNED NOT NULL,
+  VoIPAccount_People_Extension extension_type NOT NULL,
   canreinvite BOOL NOT NULL,
   host VARCHAR(50) NULL,
   port SMALLINT UNSIGNED NULL,
@@ -367,9 +366,9 @@ CREATE TABLE Sip (
 
 CREATE TABLE Iax (
   VoIPAccount_ID INTEGER UNSIGNED NOT NULL,
-  VoIPAccount_People_Extension INTEGER UNSIGNED NOT NULL,
+  VoIPAccount_People_Extension extension_type NOT NULL,
   notransfer BOOL NOT NULL,
-  host VARCHAR(50) NOT NULL,
+  host VARCHAR(50) NULL,
   port SMALLINT UNSIGNED NULL,
   PRIMARY KEY(VoIPAccount_ID, VoIPAccount_People_Extension),
   INDEX Iax_FKIndex1(VoIPAccount_People_Extension, VoIPAccount_ID),
