@@ -120,9 +120,9 @@ function agi_dial($extension, $callerId, $callerIdFull)
 	$query = "Select name ".
 		 "from Extension, Module ".
 		 "where ((ext_end is not null and ".
-		 "extension_type_comp(extension,  $extension) <= 0 ".
-		 "and extension_type_comp(ext_end,  $extension) >= 0) or ".
-		 " (ext_end is null and extension = $extension))".
+		 "extension_type_comp(extension,  '$extension') <= 0 ".
+		 "and extension_type_comp(ext_end,  '$extension') >= 0) or ".
+		 " (ext_end is null and extension = '$extension'))".
 		 " and Module_ID = Module.ID ";
 
 	$query = $db->query($query);

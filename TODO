@@ -24,6 +24,4 @@ Road map
 * dial : gestion de la fin de l'appel
 * dial : gestion d'appel multiple sur une seule carte d'appel
 * sound sequence : gestion de say digit
-* modules/pep: nouveau format d'extension
-* modules/geo : nouveau format d'extension + nouvelle gestion
 * iax.conf et sip.conf : gestion de VoIPAccount
