@@ -195,6 +195,8 @@ function agi_log($level, $msg)
  *		v joingnable ^ ouverture de communication ^ 
  * 			return a positive value (incl. 0)  which is 
  *				the price of the call
+ * 		joignable = existe, traitée par un module et que le caller a le
+ *			droit de joindre
  */
 function agi_dial(&$call)
 {
@@ -207,13 +209,21 @@ function agi_dial(&$call)
 	agi_log(DEBUG_DEBUG, "agi_dial($extension, $callerId, ".
 					"$callerIdFull)");
 
+	// on recherche a quel module appartient l'extension et si le 
+	// responsable peut joindre cette extension
 	$query = "Select name ".
-		 "from Extension, Module ".
+		 "from Extension, Module, Rights, Grp_has_People ".
 		 "where ((ext_end is not null and ".
 		 "extension_type_comp(extension,  '$extension') <= 0 ".
 		 "and extension_type_comp(ext_end,  '$extension') >= 0) or ".
 		 " (ext_end is null and extension = '$extension'))".
-		 " and Module_ID = Module.ID ";
+		 " and Extension.Module_ID = Module.ID ".
+		 "and Grp_has_People.People_Extension = ".
+		 			$call->get_responsable()." ".
+		 "and Grp_has_People.Grp_ID = Rights.Grp_ID ".
+		 "and Rights.Module_Action_ID = 0".
+		 "and Rights.Module_ID = Module.ID";
+
 
 	$query = $db->query($query);
 	check_db($query);
