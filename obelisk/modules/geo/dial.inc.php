@@ -1,8 +1,13 @@
 <?php
 
-function geo_dial($extension, $callerId, $callerIdFull)
+function geo_dial(&$call)
 {
 	global $db;
+
+
+        $extension = $call->get_extension();
+	$callerId = $call->get_cid();
+	$callerIdFull = $call->get_cidFull();
 
 	$query = "select destination.People_Extension ".
 		 "from Geographical_Alias as caller, ".
@@ -20,14 +25,16 @@ function geo_dial($extension, $callerId, $callerIdFull)
 	{
 		agi_log(DEBUG_ERR, "geo/dial.inc.php: extension : ".$extension.
 					" not found");
-		return agi_notFound($extension, $callerId, $callerIdFull);
+		return agi_notFound($call);
 	}
 	
 	agi_log(DEBUG_INFO, "geo/dial.inc.php: $extension -> ".
 			"People : ".$row[0]);
 
+	$call->set_extension($row[0]);
+	
 	include_once ('modules/people/dial.inc.php');
-	return people_dial($row[0], $callerId, $callerIdFull);
+	return people_dial($call);
 }
 
 ?>

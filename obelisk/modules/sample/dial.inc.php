@@ -20,10 +20,10 @@
  *	else return a negative number
  *	
  */
-function sample_dial($extension, $callerId, $callerIdFull)
+function sample_dial(&$call)
 {
 	agi_log(DEBUG_ERR, "sample/dial.inc.php: Not yet implemented");
-	return agi_notFound($extension, $callerId, $callerIdFull);
+	return agi_notFound($call);
 }
 
 ?>

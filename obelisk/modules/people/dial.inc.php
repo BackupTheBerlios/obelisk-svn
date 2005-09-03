@@ -1,8 +1,13 @@
 <?php
 
-function people_dial($extension, $callerId, $callerIdFull)
+function people_dial(&$call)
 {
 	global $db;
+
+        $extension = $call->get_extension();
+	$callerId = $call->get_cid();
+	$callerIdFull = $call->get_cidFull();
+			
 
 	$query = "select ChanType, username, VoIPAccount.ID ".
 		 "  from People, VoIPAccount, VoIPChannel ".
@@ -26,11 +31,10 @@ function people_dial($extension, $callerId, $callerIdFull)
 
 		agi_log(DEBUG_DEBUG, "people_dial(): $callerId : ".
 			"$extension -> '$dialStr'");
-		return agi_call($extension, $dialStr, "r", 0, 0, $callerId, 
-				$callerIdFull);
+		return agi_call($call, $dialStr, "r", 0, 0);
 	}
 			
-	return agi_notFound($extension, $callerId, $callerIdFull);
+	return agi_notFound($call);
 }
 
 ?>

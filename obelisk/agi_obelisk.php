@@ -3,6 +3,6 @@
 
 include('agi_util.inc.php');
 
-agi_dial($extension, $callerId, $callerIdFull);
+agi_dial($call);
 
 ?>
