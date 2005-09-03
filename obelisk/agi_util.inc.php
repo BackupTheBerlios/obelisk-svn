@@ -279,7 +279,7 @@ function agi_check($no_kill = false)
 		$code = substr($line, 0, 4);
 		switch($code) {
 			case "200 ":
-				$a = explode("=", $line);
+				$a = explode("=", $line, 2);
 
 				// Handle hangup
 				if (substr($a[1], 0, 2) == "-1") 
@@ -291,13 +291,13 @@ function agi_check($no_kill = false)
 
 				return $a[1];
 			case "510 ":
-				agi_log(DEBUG_ERROR, "510 $line");
+				agi_log(DEBUG_ERR, "510 $line");
 				return -510;
 			case "520 ":
-				agi_log(DEBUG_ERROR, "510 $line");
+				agi_log(DEBUG_ERR, "510 $line");
 				return -520;
 			default:
-				agi_log(DEBUG_INF, "--- $line");
+				agi_log(DEBUG_INFO, "--- $line");
 		}
 	}
 	
@@ -398,9 +398,23 @@ function agi_error_handler($errno, $errstr, $errfile, $errline)
 	}
 }
 
+/**
+ * agi_notFound - send an info tone to the dialer and log the call
+ *			this return -1 because it's always a "bad call"
+ *			the price of ths call il always null 
+ */
 function agi_notFound(&$call)
 {
-	agi_log(DEBUG_CRIT, "agi_notFound: not yet implemented");
+	agi_log(DEBUG_ERR, "agi_notFound !!!");
+
+	agi_logCall (&$call, 0, 0, 'NOT FOUND');
+
+	while (agi_play_soundSet(SOUNDSET_NOT_FOUND, "") == 0)
+	{
+		sleep(3);
+	}
+
+	return -1;
 }
 
 /**
@@ -534,33 +548,23 @@ function agi_credit($account, $modification)
 }
 
 /**
- * agi_play - play a sound and allow $dtmf to stop this sound. This
- *		function take an Id of the sound in the database as paramter
- *		and look in this database in order to get the filename.
+ * agi_play - play a sound and allow $dtmf to stop this sound. 
  *		
  *		This function doesn't check if the file really exist but if the
  *		Id of the sound doesn't exist it's return -1
  *
- * PRE: $soundId : the Id of the sound in the database
+ * PRE: $soundFile : sound filename
  *	$dtmf : allowed dtmf
  * POST: $soundId is played if the Id is corrected
  *	return 	-1 : if there is an error
  *		 0 : if the song is correctly played and not stopped
  *		 a dtmf (0 is return as 10, # as '#' and * as '*'
  */
-function agi_play($soundId, $dtmf = "0123456789#*")
+function agi_play($soundFile, $dtmf = "0123456789#*")
 {
 	global $db;
 	
-	$query = "Select Filename from AgiSound where ID=$soundId";
-
-	$query = $db->query($query);
-	check_db($query);
-	
-	if (!($row = $query->fetchRow(DB_FETCHMODE_ORDERED)))
-		return -1;
-	
-	$result = agi_write("STREAM FILE \"".$row[0]."\" \"${dtmf}\"", true);
+	$result = agi_write("STREAM FILE \"".$soundFile."\" \"${dtmf}\"", true);
 	/* 
 		Returns:
 		failure: -1 endpos=<sample offset>
@@ -568,7 +572,6 @@ function agi_play($soundId, $dtmf = "0123456789#*")
 		success: 0 endpos=<offset>
 		digit pressed: <digit> endpos=<offset>
 	*/
-  
   	$first = explode(" ", $result);
 	$first = $first[0];
 
@@ -659,14 +662,17 @@ function agi_sayNumber($digits, $dtmf = "#")
  */
 function agi_play_soundSet($soundSetId, $dtmf = "0123456789*#")
 {
+	global $db;
+
 	$query = "select Filename ".
 		 "from AgiSound, AgiSound_Set ".
-		 "where AgiSound.IF = AgiSound_ID ".
+		 "where AgiSound.ID = AgiSound_ID ".
+		 " and AgiSound_Set.ID = $soundSetId ".
 		 "order by Priority";
-	
+
 	$query = $db->query($query);
 	check_db($query);
-
+	
 	unset($result);
 	while ($row = $query->fetchRow(DB_FETCHMODE_ORDERED))
 	{
@@ -682,7 +688,7 @@ function agi_play_soundSet($soundSetId, $dtmf = "0123456789*#")
 }
 
 /**
- * agi_play_soundSet_read - play a soundset and read at least $min digit and
+ * agi_playSoundSet_read - play a soundset and read at least $min digit and
  *				maximum $max digit from the user. The user has
  *				to use the pound key in order to enter a 
  *				number of digit lower than the $maximum number
@@ -770,5 +776,18 @@ function agi_play_soundSet_read($soundSetId, $min, $max, $timeout = 20,
 	// nombre maximum de digit atteind :
 	return $result;
 }
- 
+
+/**
+ * agi_playTone - play a tone for $nSec seconds
+ *
+ */
+function agi_playTone($tone, $nSec) 
+{
+	agi_log(DEBUG_DEBUG, "Playing tone ".$tone." for ".$nSec." seconds");
+	agi_write("EXEC Playtones ".$tone);
+	sleep($nSec);
+	agi_write("EXEC StopPlaytones");
+	return 0; // price : 0
+}
+
 ?>

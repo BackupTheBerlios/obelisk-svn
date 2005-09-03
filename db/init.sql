@@ -44,3 +44,12 @@ insert into rights values (0, 0, 2);
 insert into rights values (0, 0, 3);
 insert into rights values (0, 0, 4);
 
+-- sound sequence
+insert into AgiSound values (1, 'notFound');
+insert into AgiSound_Set values (1, 0, 1);
+insert into AgiSound values (2, 'endOfMoney');
+insert into AgiSound_Set values (2, 0, 2);
+insert into AgiSound values (3, 'notEnoughMoney');
+insert into AgiSound_Set values (3, 0, 3);
+
+
