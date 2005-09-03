@@ -23,8 +23,6 @@ Road map
 * dial : ajout du support des sÃ©quence (flag g de dial)
 * dial : gestion de la fin de l'appel
 * dial : gestion d'appel multiple sur une seule carte d'appel
-* sound sequence : gestion de say digit
 * iax.conf et sip.conf : gestion de VoIPAccount
 * notFound
 * gestion d'erreur de crédit
-* gestion des droit

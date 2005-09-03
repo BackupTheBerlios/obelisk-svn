@@ -550,6 +550,8 @@ function agi_credit($account, $modification)
  */
 function agi_play($soundId, $dtmf = "0123456789#*")
 {
+	global $db;
+	
 	$query = "Select Filename from AgiSound where ID=$soundId";
 
 	$query = $db->query($query);
@@ -585,6 +587,64 @@ function agi_play($soundId, $dtmf = "0123456789#*")
 		$first = 10;
 	
 	return $first;
+}
+
+/**
+ * agi_sayDigits - like agi_lay but says digits instead of a soundset :
+ *
+ *	1234 is played  : '1', '2', '3', '4'
+ */
+function agi_sayDigits($digits, $dtmf = "#")
+{
+	$result = agi_write("SAY DIGITS $digits \"${dtmf}\"", true);
+	/* 
+		Returns:
+		failure: -1
+		success: 0 
+		digit pressed: <digit>
+	*/
+  
+	if ($result == -1)
+		return -1; // failure
+	
+	if ($result == 0)
+		return 0;  // success
+	
+	$result = chr($result);
+
+	if ($result == 0)
+		$result = 10;
+	
+	return $result;
+}
+
+/**
+ * agi_sayNumber - like agi_lay but says digits instead of a soundset :
+ *
+ *	1234 is played  : "one thousand two hundred and thirty four"
+ */
+function agi_sayNumber($digits, $dtmf = "#")
+{
+	$result = agi_write("SAY NUMBER $digits \"${dtmf}\"", true);
+	/* 
+		Returns:
+		failure: -1
+		success: 0 
+		digit pressed: <digit>
+	*/
+  
+	if ($result == -1)
+		return -1; // failure
+	
+	if ($result == 0)
+		return 0;  // success
+	
+	$result = chr($result);
+
+	if ($result == 0)
+		$result = 10;
+	
+	return $result;
 }
 
 /**
