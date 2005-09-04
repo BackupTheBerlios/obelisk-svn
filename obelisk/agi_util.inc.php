@@ -22,6 +22,7 @@ class callObj {
 	var $callerId, $extension;
 	var $responsable, $isLocalPep;
 	var $agiVars;
+	var $lastTryStatus; // return status of Dial application
 
 	// constructor
 	// if responsable is not found : responsable = '' = a valid
@@ -71,6 +72,8 @@ class callObj {
 				$this->responsable = $row[0];
 		}
 
+		$this->lastTryStatus = NULL;
+
 	}
 
 	function is_local()
@@ -106,6 +109,16 @@ class callObj {
 	function set_extension($new_ext)
 	{
 		$this->extension = $new_ext;
+	}
+
+	function set_lastTryStatus($status)
+	{
+		$this->lastTryStatus = $status;
+	}
+
+	function get_lastTryStatus()
+	{
+		return $this->lastTryStatus;
 	}
 }
 		
@@ -430,6 +443,7 @@ function agi_notFound(&$call)
  *	 * $price the price/minutes of the call >= 0
  * 	 * $callerId a the callerId (only the number)
  *	 * $callerIdFull : full callerId
+ *	 * logIfFailed : if the function have to log a call even if it failed.
  *
  *
  * POST : * call is logged
@@ -438,10 +452,12 @@ function agi_notFound(&$call)
  *	  * if the callerId is not a person, it checks for a owner
  *	  	of the callerId in the database and use his prepaid card
  *	  * return the price of the call
+ *	  * $call->set_lastTryStatus with the return status of Application Dial
+ *		in case of 'not enough of money' : "MONEY'
  */
 	  
 function agi_call(&$call, $callStr, $callOptions, 
-		  $priceConn, $price)
+		  $priceConn, $price, $logIfFailed = true)
 {
 	global $db;
 	
@@ -482,9 +498,14 @@ function agi_call(&$call, $callStr, $callOptions,
 	if (($price + $priceConn) > $credit )
 		// pas assez de crédit d'appel pour effectuer l'appel en 
 		// question
-//		return agi_dial(NOT_ENOUGH_MONEY, $callerId, $callerIdFull);
-		agi_log(DEBUG_CRIT, 
-			"agi_call(): not enough money not implemented");
+	{
+		agi_log(DEBUG_INFO, 
+			"agi_call(): not enough money");
+		agi_play_soundSet(SOUNDSET_NOT_ENOUGH_MONEY, "");
+		$call->set_lastTryStatus("MONEY");
+		return -1;
+	}
+
 	
 	// bon on a assez de soux que pour faire l'appel.... on dial
 	if ($price == 0)
@@ -496,7 +517,11 @@ function agi_call(&$call, $callStr, $callOptions,
 	}
 	$answeredTime = agi_getVar("ANSWEREDTIME");
 	$dialStatus = agi_getVar("DIALSTATUS");
-	agi_log(DEBUG_INFO, "agi_dial : $extension -> $callStr ".
+
+	$call->set_lastTryStatus($dialStatus);
+	
+	if ($logIfFailed || $dialStatus == "ANSWER")
+		agi_log(DEBUG_INFO, "agi_dial : $extension -> $callStr ".
 				": $dialStatus : $answeredTime");
 	
 	$total = $priceConn + ceil($answeredTime/60);

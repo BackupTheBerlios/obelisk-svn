@@ -17,12 +17,8 @@ Road map
 * rights managment basic/sample implementations
 -----------------------------------
 
-* dial : support d'unne array de callStr + gestion prix
 * dial : annonce du prix
 * sound sequence : flag info... vÃ©rifier la doc d'asterisk
 * dial : ajout du support des sÃ©quence (flag g de dial)
-* dial : gestion de la fin de l'appel
-* dial : gestion d'appel multiple sur une seule carte d'appel
 * iax.conf et sip.conf : gestion de VoIPAccount
-* notFound
-* gestion d'erreur de crédit
+* gestion d'erreur de crédit négatif ? ? ? ?
