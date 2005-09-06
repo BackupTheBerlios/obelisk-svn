@@ -1,12 +1,15 @@
 CREATE TABLE NetworkProvider (
   ID INTEGER UNSIGNED NOT NULL,
   Name VARCHAR(32) NOT NULL,
+  Channel VARCHAR(128) NOT NULL,
+  RmDigits SMALLINT UNSIGNED NOT NULL,
+  AddDigits extension_type NOT NULL,
+  DialOpts VARCHAR(10) NOT NULL,
   PRIMARY KEY(ID)
 );
 
 CREATE TABLE NetworkTimeZone (
   ID INTEGER UNSIGNED NOT NULL,
-  AsteriskDescString VARCHAR(64) NOT NULL,
   Name VARCHAR(32) NOT NULL,
   PRIMARY KEY(ID),
   UNIQUE INDEX NetworkTimeZone_Unique(Name)
@@ -21,6 +24,7 @@ CREATE TABLE Module (
 CREATE TABLE Network (
   ID INTEGER UNSIGNED NOT NULL,
   Name VARCHAR(64) NOT NULL,
+  SubNetwork_function VARCHAR(24) NULL,
   PRIMARY KEY(ID)
 );
 
@@ -65,9 +69,9 @@ CREATE TABLE Grp (
 );
 
 CREATE TABLE Geographical_Group (
-  Extension extension_type NOT NULL,
+  ID INTEGER UNSIGNED NOT NULL,
   Name VARCHAR(32) NOT NULL,
-  PRIMARY KEY(Extension)
+  PRIMARY KEY(ID)
 );
 
 CREATE TABLE AgiSound (
@@ -76,16 +80,23 @@ CREATE TABLE AgiSound (
   PRIMARY KEY(ID)
 );
 
-CREATE TABLE People_PrePay_Settings (
-  People_Extension extension_type NOT NULL,
-  Credit DECIMAL(8,4) NOT NULL DEFAULT '0',
-  Announce DECIMAL(1) NOT NULL DEFAULT '1',
-  AskHigherCost BOOL NOT NULL,
-  AllowOtherCID BOOL NOT NULL,
-  PRIMARY KEY(People_Extension),
-  INDEX People_PrePay_Settings_FKIndex1(People_Extension),
-  FOREIGN KEY(People_Extension)
-    REFERENCES People(Extension)
+CREATE TABLE NetworkTimeZone_Details (
+  NetworkTimeZone_ID INTEGER UNSIGNED NOT NULL,
+  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  start_min SMALLINT UNSIGNED NOT NULL,
+  start_hour SMALLINT UNSIGNED NOT NULL,
+  start_dom SMALLINT UNSIGNED NOT NULL,
+  start_month SMALLINT UNSIGNED NOT NULL,
+  start_dow SMALLINT UNSIGNED NOT NULL,
+  end_min SMALLINT UNSIGNED NOT NULL,
+  end_hour SMALLINT UNSIGNED NOT NULL,
+  end_dom SMALLINT UNSIGNED NOT NULL,
+  end_month SMALLINT UNSIGNED NOT NULL,
+  end_dow SMALLINT UNSIGNED NOT NULL,
+  PRIMARY KEY(NetworkTimeZone_ID, ID),
+  INDEX NetworkTimeZone_Details_FKIndex1(NetworkTimeZone_ID),
+  FOREIGN KEY(NetworkTimeZone_ID)
+    REFERENCES NetworkTimeZone(ID)
       ON DELETE CASCADE
       ON UPDATE CASCADE
 );
@@ -100,6 +111,20 @@ CREATE TABLE AgiSound_Set (
     REFERENCES AgiSound(ID)
       ON DELETE NO ACTION
       ON UPDATE NO ACTION
+);
+
+CREATE TABLE People_PrePay_Settings (
+  People_Extension extension_type NOT NULL,
+  Credit DECIMAL(8,4) NOT NULL DEFAULT '0',
+  Announce DECIMAL(1) NOT NULL DEFAULT '1',
+  AskHigherCost BOOL NOT NULL,
+  AllowOtherCID BOOL NOT NULL,
+  PRIMARY KEY(People_Extension),
+  INDEX People_PrePay_Settings_FKIndex1(People_Extension),
+  FOREIGN KEY(People_Extension)
+    REFERENCES People(Extension)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE
 );
 
 CREATE TABLE AgiLog (
@@ -216,7 +241,7 @@ CREATE TABLE Grp_has_People (
 );
 
 CREATE TABLE Extension (
-  Extension extension_type NOT NULL AUTO_INCREMENT,
+  Extension extension_type NOT NULL,
   Responsable_Extension extension_type NULL,
   Module_ID INTEGER UNSIGNED NOT NULL,
   ext_end extension_type NULL,
@@ -235,18 +260,18 @@ CREATE TABLE Extension (
 
 CREATE TABLE Geographical_alias (
   Extension extension_type NOT NULL,
-  Geographical_Group_Extension extension_type NOT NULL,
+  Geographical_Group_ID INTEGER UNSIGNED NOT NULL,
   People_Extension extension_type NOT NULL,
-  PRIMARY KEY(Extension, Geographical_Group_Extension),
-  INDEX Geographical_alias_FKIndex1(Geographical_Group_Extension),
+  PRIMARY KEY(Extension, Geographical_Group_ID),
+  INDEX Geographical_alias_FKIndex1(Geographical_Group_ID),
   INDEX Geographical_alias_FKIndex2(People_Extension),
-  UNIQUE INDEX Geographical_alias_uniqPepGrp(People_Extension, Geographical_Group_Extension),
+  UNIQUE INDEX Geographical_alias_uniqPepGrp(People_Extension),
   FOREIGN KEY(People_Extension)
     REFERENCES People(Extension)
       ON DELETE CASCADE
       ON UPDATE CASCADE,
-  FOREIGN KEY(Geographical_Group_Extension)
-    REFERENCES Geographical_Group(Extension)
+  FOREIGN KEY(Geographical_Group_ID)
+    REFERENCES Geographical_Group(ID)
       ON DELETE CASCADE
       ON UPDATE CASCADE
 );
@@ -356,6 +381,7 @@ CREATE TABLE Sip (
   canreinvite BOOL NOT NULL,
   host VARCHAR(50) NULL,
   port SMALLINT UNSIGNED NULL,
+  dtmfmode SMALLINT UNSIGNED NOT NULL,
   PRIMARY KEY(VoIPAccount_ID, VoIPAccount_People_Extension),
   INDEX Sip_FKIndex1(VoIPAccount_People_Extension, VoIPAccount_ID),
   FOREIGN KEY(VoIPAccount_People_Extension, VoIPAccount_ID)

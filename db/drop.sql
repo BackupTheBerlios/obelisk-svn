@@ -26,9 +26,11 @@ DROP TABLE Module_Action;
 
 DROP TABLE AgiLog;
 
+DROP TABLE People_PrePay_Settings;
+
 DROP TABLE AgiSound_Set;
 
-DROP TABLE People_PrePay_Settings;
+DROP TABLE NetworkTimeZone_Details;
 
 DROP TABLE AgiSound;
 
