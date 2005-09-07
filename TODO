@@ -17,11 +17,9 @@ Road map
 * rights managment basic/sample implementations			DONE
 -----------------------------------
 
-* dial : annonce du prix
 * iax.conf et sip.conf : gestion de VoIPAccount
 * gestion d'erreur de crédit négatif ? ? ?
 
---> module outside
 --> plugin pour people : avant et après???
 --> menu web
 ---> moteur de session
