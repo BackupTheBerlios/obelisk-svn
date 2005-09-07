@@ -2,8 +2,6 @@ CREATE TABLE NetworkProvider (
   ID INTEGER UNSIGNED NOT NULL,
   Name VARCHAR(32) NOT NULL,
   Channel VARCHAR(128) NOT NULL,
-  RmDigits SMALLINT UNSIGNED NOT NULL,
-  AddDigits extension_type NOT NULL,
   DialOpts VARCHAR(10) NOT NULL,
   PRIMARY KEY(ID)
 );
@@ -310,6 +308,8 @@ CREATE TABLE Price (
   NetworkTimeZone_ID INTEGER UNSIGNED NOT NULL,
   Price DECIMAL(5,4) NOT NULL,
   ConnectionPrice DECIMAL(5,4) NOT NULL,
+  AddDigits extension_type NOT NULL,
+  RmDigits SMALLINT UNSIGNED NOT NULL,
   PRIMARY KEY(Network_ID, NetworkProvider_ID, NetworkTimeZone_ID),
   INDEX Price_FKIndex1(Network_ID),
   INDEX Price_FKIndex2(NetworkProvider_ID),
