@@ -51,5 +51,9 @@ insert into AgiSound values (2, 'endOfMoney');
 insert into AgiSound_Set values (2, 0, 2);
 insert into AgiSound values (3, 'notEnoughMoney');
 insert into AgiSound_Set values (3, 0, 3);
-
-
+insert into AgiSound values (4, 'priceAnnounce');
+insert into AgiSound_Set values (4, 0, 4);
+insert into AgiSound values (5, 'unvailAtPrice');
+insert into AgiSound_Set values (5, 0, 5);
+insert into AgiSound values (6, 'currency');
+insert into AgiSound_Set values (6, 0, 6);

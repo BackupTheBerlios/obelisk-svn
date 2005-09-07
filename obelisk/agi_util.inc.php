@@ -277,7 +277,7 @@ function agi_dial(&$call)
  */
 function agi_check($no_kill = false)
 {
-	agi_log(DEBUG_DEBUG, "agi_check()");
+//	agi_log(DEBUG_DEBUG, "agi_check()");
 	
 	while($line = agi_read()) {
 		if ($line == "") {
@@ -567,7 +567,7 @@ function agi_credit($account, $modification)
 	
 	$query = "update People_PrePay_Settings ".
 	         "set credit = credit + (${modification}) ".
-		 "where People_Extension = $callerId ";
+		 "where People_Extension = $account ";
 	
 	$db->query($query);
 }

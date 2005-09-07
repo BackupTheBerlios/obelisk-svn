@@ -7,18 +7,22 @@ Road map
 * specifications for right managments				DONE
 * specifications for web and AGI module				 25%
 * AGI:								DONE
-*	Obelisk(${EXTEN})					 10%
+*	Obelisk(${EXTEN})					DONE
 *	Obelisk_menu(${EXTEN})					  5%
-*	Obelisk_geo(ID, ${EXTEN})				100%
+*	Obelisk_geo(ID, ${EXTEN})				DONE
 *	Obelisk_external(ID, ${EXTEN})				
 * verify all specifications
 * documentation							25%
 -----------------------------------
-* rights managment basic/sample implementations
+* rights managment basic/sample implementations			DONE
 -----------------------------------
 
 * dial : annonce du prix
-* sound sequence : flag info... vÃ©rifier la doc d'asterisk
-* dial : ajout du support des sÃ©quence (flag g de dial)
 * iax.conf et sip.conf : gestion de VoIPAccount
-* gestion d'erreur de crédit négatif ? ? ? ?
+* gestion d'erreur de crédit négatif ? ? ?
+
+--> module outside
+--> plugin pour people : avant et après???
+--> menu web
+---> moteur de session
+--> menu AGI
