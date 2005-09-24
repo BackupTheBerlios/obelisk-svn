@@ -8,35 +8,35 @@ DROP TABLE Price;
 
 DROP TABLE WebMenu;
 
+DROP TABLE Extension;
+
 DROP TABLE Geographical_alias;
 
-DROP TABLE Extension;
+DROP TABLE Rights;
 
 DROP TABLE Grp_has_People;
 
-DROP TABLE VoIPAccount;
-
 DROP TABLE AgiInterface;
 
-DROP TABLE Rights;
+DROP TABLE VoIPAccount;
 
 DROP TABLE NetworkMask;
 
 DROP TABLE Module_Action;
 
-DROP TABLE AgiLog;
-
 DROP TABLE People_PrePay_Settings;
+
+DROP TABLE AgiLog;
 
 DROP TABLE AgiSound_Set;
 
 DROP TABLE NetworkTimeZone_Details;
 
-DROP TABLE AgiSound;
-
 DROP TABLE Geographical_Group;
 
-DROP TABLE Grp;
+DROP TABLE AsteriskGoto;
+
+DROP TABLE AgiSound;
 
 DROP TABLE Raw_Extension;
 
@@ -46,12 +46,14 @@ DROP TABLE WebInterface;
 
 DROP TABLE VoIPChannel;
 
-DROP TABLE Network;
+DROP TABLE NetworkTimeZone;
 
 DROP TABLE Module;
 
-DROP TABLE NetworkTimeZone;
+DROP TABLE Grp;
 
 DROP TABLE NetworkProvider;
+
+DROP TABLE Network;
 
 

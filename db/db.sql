@@ -1,3 +1,10 @@
+CREATE TABLE Network (
+  ID INTEGER UNSIGNED NOT NULL,
+  Name VARCHAR(64) NOT NULL,
+  SubNetwork_function VARCHAR(24) NULL,
+  PRIMARY KEY(ID)
+);
+
 CREATE TABLE NetworkProvider (
   ID INTEGER UNSIGNED NOT NULL,
   Name VARCHAR(32) NOT NULL,
@@ -6,11 +13,10 @@ CREATE TABLE NetworkProvider (
   PRIMARY KEY(ID)
 );
 
-CREATE TABLE NetworkTimeZone (
-  ID INTEGER UNSIGNED NOT NULL,
+CREATE TABLE Grp (
+  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   Name VARCHAR(32) NOT NULL,
-  PRIMARY KEY(ID),
-  UNIQUE INDEX NetworkTimeZone_Unique(Name)
+  PRIMARY KEY(ID)
 );
 
 CREATE TABLE Module (
@@ -19,11 +25,11 @@ CREATE TABLE Module (
   PRIMARY KEY(ID)
 );
 
-CREATE TABLE Network (
+CREATE TABLE NetworkTimeZone (
   ID INTEGER UNSIGNED NOT NULL,
-  Name VARCHAR(64) NOT NULL,
-  SubNetwork_function VARCHAR(24) NULL,
-  PRIMARY KEY(ID)
+  Name VARCHAR(32) NOT NULL,
+  PRIMARY KEY(ID),
+  UNIQUE INDEX NetworkTimeZone_Unique(Name)
 );
 
 CREATE TABLE VoIPChannel (
@@ -60,21 +66,21 @@ CREATE TABLE Raw_Extension (
   PRIMARY KEY(Extension)
 );
 
-CREATE TABLE Grp (
-  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  Name VARCHAR(32) NOT NULL,
+CREATE TABLE AgiSound (
+  ID INTEGER UNSIGNED NOT NULL,
+  Filename VARCHAR(20) NOT NULL,
   PRIMARY KEY(ID)
+);
+
+CREATE TABLE AsteriskGoto (
+  Extension extension_type NOT NULL,
+  context VARCHAR(32) NOT NULL,
+  PRIMARY KEY(Extension)
 );
 
 CREATE TABLE Geographical_Group (
   ID INTEGER UNSIGNED NOT NULL,
   Name VARCHAR(32) NOT NULL,
-  PRIMARY KEY(ID)
-);
-
-CREATE TABLE AgiSound (
-  ID INTEGER UNSIGNED NOT NULL,
-  Filename VARCHAR(20) NOT NULL,
   PRIMARY KEY(ID)
 );
 
@@ -111,20 +117,6 @@ CREATE TABLE AgiSound_Set (
       ON UPDATE NO ACTION
 );
 
-CREATE TABLE People_PrePay_Settings (
-  People_Extension extension_type NOT NULL,
-  Credit DECIMAL(8,4) NOT NULL DEFAULT '0',
-  Announce DECIMAL(1) NOT NULL DEFAULT '1',
-  AskHigherCost BOOL NOT NULL,
-  AllowOtherCID BOOL NOT NULL,
-  PRIMARY KEY(People_Extension),
-  INDEX People_PrePay_Settings_FKIndex1(People_Extension),
-  FOREIGN KEY(People_Extension)
-    REFERENCES People(Extension)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE
-);
-
 CREATE TABLE AgiLog (
   ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   Responsable_Extension extension_type NULL,
@@ -139,6 +131,20 @@ CREATE TABLE AgiLog (
   FOREIGN KEY(Responsable_Extension)
     REFERENCES People(Extension)
       ON DELETE NO ACTION
+      ON UPDATE CASCADE
+);
+
+CREATE TABLE People_PrePay_Settings (
+  People_Extension extension_type NOT NULL,
+  Credit DECIMAL(8,4) NOT NULL DEFAULT '0',
+  Announce DECIMAL(1) NOT NULL DEFAULT '1',
+  AskHigherCost BOOL NOT NULL,
+  AllowOtherCID BOOL NOT NULL,
+  PRIMARY KEY(People_Extension),
+  INDEX People_PrePay_Settings_FKIndex1(People_Extension),
+  FOREIGN KEY(People_Extension)
+    REFERENCES People(Extension)
+      ON DELETE CASCADE
       ON UPDATE CASCADE
 );
 
@@ -167,21 +173,22 @@ CREATE TABLE NetworkMask (
       ON UPDATE CASCADE
 );
 
-CREATE TABLE Rights (
-  Grp_ID INTEGER UNSIGNED NOT NULL,
-  Module_Action_ID INTEGER UNSIGNED NOT NULL,
-  Module_ID INTEGER UNSIGNED NOT NULL,
-  PRIMARY KEY(Grp_ID, Module_Action_ID, Module_ID),
-  INDEX Rights_FKIndex1(Grp_ID),
-  INDEX Right_FKIndex2(Module_ID, Module_Action_ID),
-  FOREIGN KEY(Grp_ID)
-    REFERENCES Grp(ID)
+CREATE TABLE VoIPAccount (
+  People_Extension extension_type NOT NULL,
+  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  VoIPChannel_ID SMALLINT UNSIGNED NOT NULL,
+  Enable BOOL NOT NULL,
+  PRIMARY KEY(People_Extension, ID),
+  INDEX VoIPAccount_FKIndex1(People_Extension),
+  INDEX VoIPAccount_FKIndex2(VoIPChannel_ID),
+  FOREIGN KEY(People_Extension)
+    REFERENCES People(Extension)
       ON DELETE CASCADE
       ON UPDATE CASCADE,
-  FOREIGN KEY(Module_ID, Module_Action_ID)
-    REFERENCES Module_Action(Module_ID, Action_ID)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE
+  FOREIGN KEY(VoIPChannel_ID)
+    REFERENCES VoIPChannel(ID)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION
 );
 
 CREATE TABLE AgiInterface (
@@ -204,24 +211,6 @@ CREATE TABLE AgiInterface (
       ON UPDATE NO ACTION
 );
 
-CREATE TABLE VoIPAccount (
-  People_Extension extension_type NOT NULL,
-  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  VoIPChannel_ID SMALLINT UNSIGNED NOT NULL,
-  Enable BOOL NOT NULL,
-  PRIMARY KEY(People_Extension, ID),
-  INDEX VoIPAccount_FKIndex1(People_Extension),
-  INDEX VoIPAccount_FKIndex2(VoIPChannel_ID),
-  FOREIGN KEY(People_Extension)
-    REFERENCES People(Extension)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE,
-  FOREIGN KEY(VoIPChannel_ID)
-    REFERENCES VoIPChannel(ID)
-      ON DELETE NO ACTION
-      ON UPDATE NO ACTION
-);
-
 CREATE TABLE Grp_has_People (
   Grp_ID INTEGER UNSIGNED NOT NULL,
   People_Extension extension_type NOT NULL,
@@ -234,6 +223,41 @@ CREATE TABLE Grp_has_People (
       ON UPDATE CASCADE,
   FOREIGN KEY(People_Extension)
     REFERENCES People(Extension)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE
+);
+
+CREATE TABLE Rights (
+  Grp_ID INTEGER UNSIGNED NOT NULL,
+  Module_Action_ID INTEGER UNSIGNED NOT NULL,
+  Module_ID INTEGER UNSIGNED NOT NULL,
+  PRIMARY KEY(Grp_ID, Module_Action_ID, Module_ID),
+  INDEX Rights_FKIndex1(Grp_ID),
+  INDEX Right_FKIndex2(Module_ID, Module_Action_ID),
+  FOREIGN KEY(Grp_ID)
+    REFERENCES Grp(ID)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE,
+  FOREIGN KEY(Module_ID, Module_Action_ID)
+    REFERENCES Module_Action(Module_ID, Action_ID)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE
+);
+
+CREATE TABLE Geographical_alias (
+  Extension extension_type NOT NULL,
+  Geographical_Group_ID INTEGER UNSIGNED NOT NULL,
+  People_Extension extension_type NOT NULL,
+  PRIMARY KEY(Extension, Geographical_Group_ID),
+  INDEX Geographical_alias_FKIndex1(Geographical_Group_ID),
+  INDEX Geographical_alias_FKIndex2(People_Extension),
+  UNIQUE INDEX Geographical_alias_uniqPepGrp(People_Extension),
+  FOREIGN KEY(People_Extension)
+    REFERENCES People(Extension)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE,
+  FOREIGN KEY(Geographical_Group_ID)
+    REFERENCES Geographical_Group(ID)
       ON DELETE CASCADE
       ON UPDATE CASCADE
 );
@@ -253,24 +277,6 @@ CREATE TABLE Extension (
   FOREIGN KEY(Responsable_Extension)
     REFERENCES People(Extension)
       ON DELETE SET NULL
-      ON UPDATE CASCADE
-);
-
-CREATE TABLE Geographical_alias (
-  Extension extension_type NOT NULL,
-  Geographical_Group_ID INTEGER UNSIGNED NOT NULL,
-  People_Extension extension_type NOT NULL,
-  PRIMARY KEY(Extension, Geographical_Group_ID),
-  INDEX Geographical_alias_FKIndex1(Geographical_Group_ID),
-  INDEX Geographical_alias_FKIndex2(People_Extension),
-  UNIQUE INDEX Geographical_alias_uniqPepGrp(People_Extension),
-  FOREIGN KEY(People_Extension)
-    REFERENCES People(Extension)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE,
-  FOREIGN KEY(Geographical_Group_ID)
-    REFERENCES Geographical_Group(ID)
-      ON DELETE CASCADE
       ON UPDATE CASCADE
 );
 
