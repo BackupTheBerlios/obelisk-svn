@@ -98,8 +98,8 @@ function outside_dial(&$call)
 			$provider =  $query->fetchRow(DB_FETCHMODE_ORDERED);
 		}
 
-		// annonce qu'il est impossible d'effectuer l'appel au pris
-		// nnoncé précédement
+		// annonce qu'il est impossible d'effectuer l'appel au prix
+		// annoncé précédement
 		agi_play_soundSet(SOUNDSET_UNAVAIL_AT_PRICE, "");
 
 		$first = false;
@@ -131,7 +131,8 @@ function outside_getNetworkId(&$call)
 	$query = "select N.ID, N.SubNetwork_function ".
 		 " from  Network as N, NetworkMask as M ".
 		 " where N.ID = M.Network_ID ".
-		 "  and  '".$call->get_extension()."' LIKE M.Mask";
+		 "  and extension_type_comp('".$call->get_extension()."', M.extStart) >= 0 ".
+		 "  and extension_type_comp('".$call->get_extension()."', M.extEnd) <= 0 ";
 	
 	$query = $db->query($query);
 	check_db($query);

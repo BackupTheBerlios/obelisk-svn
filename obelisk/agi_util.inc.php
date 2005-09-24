@@ -503,6 +503,9 @@ function agi_call(&$call, $callStr, $callOptions,
 			"agi_call(): not enough money");
 		agi_play_soundSet(SOUNDSET_NOT_ENOUGH_MONEY, "");
 		$call->set_lastTryStatus("MONEY");
+	
+		if ($logIfFailed)
+			agi_logCall($call, $price, 0, "MONEY");
 		return -1;
 	}
 
@@ -512,25 +515,25 @@ function agi_call(&$call, $callStr, $callOptions,
 		agi_write("EXEC DIAL ${callStr}||${callOptions}",true);
 	else
 	{
-		$maxSec = ($credit-$priceConn)/$price*60;
-		agi_write("EXEC DIAL ${callStr}||${callOptions}L(${maxSec})");
+		$maxSec = ($credit-$priceConn)/$price*60*1000;
+		agi_write("EXEC DIAL ${callStr}||${callOptions}L(${maxSec})",true);
 	}
 	$answeredTime = agi_getVar("ANSWEREDTIME");
 	$dialStatus = agi_getVar("DIALSTATUS");
 
 	$call->set_lastTryStatus($dialStatus);
 	
-	if ($logIfFailed || $dialStatus == "ANSWER")
-		agi_log(DEBUG_INFO, "agi_dial : $extension -> $callStr ".
+	agi_log(DEBUG_INFO, "agi_dial : $extension -> $callStr ".
 				": $dialStatus : $answeredTime");
 	
-	$total = $priceConn + ceil($answeredTime/60);
+	$total = $priceConn + ceil($answeredTime/60)*$price;
 	if ($dialStatus == "ANSWER")
 	{
 		agi_credit($account, -($total));
 	}
 
-	agi_logCall($call, $price, $answeredTime, $dialStatus);
+	if ($logIfFailed || $dialStatus == "ANSWER")
+		agi_logCall($call, $price, $answeredTime, $dialStatus);
 
 	return $total;
 }
@@ -564,12 +567,16 @@ function agi_logCall (&$call, $price, $time, $status)
 function agi_credit($account, $modification)
 {
 	global $db;
-	
+
+	agi_log (DEBUG_INFO, "agi_credit($account, $modification)");
+
 	$query = "update People_PrePay_Settings ".
 	         "set credit = credit + (${modification}) ".
 		 "where People_Extension = $account ";
 	
 	$db->query($query);
+
+	db_check($db);
 }
 
 /**
@@ -815,4 +822,17 @@ function agi_playTone($tone, $nSec)
 	return 0; // price : 0
 }
 
+
+/**
+ * agi_goto - goto an other asterisk context.
+ *
+ *
+ * PRE: $context is a valid asterisk $context
+ * POST: goto $context
+ *       this disable every cdr log
+ */
+function agi_goto($context)
+{
+	agi_log(DEBUG_CRIT, "agi_goto: need to be implemented");
+}
 ?>

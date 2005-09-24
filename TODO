@@ -1,25 +1,13 @@
 Road map
 --------
 
-* the databse scheme for basic functions			DONE
-* exportation/cron support					DONE
-* specifications for authentification and session for AGI&Web 	DONE
-* specifications for right managments				DONE
-* specifications for web and AGI module				 25%
-* AGI:								DONE
-*	Obelisk(${EXTEN})					DONE
 *	Obelisk_menu(${EXTEN})					  5%
-*	Obelisk_geo(ID, ${EXTEN})				DONE
-*	Obelisk_external(ID, ${EXTEN})				
-* verify all specifications
 * documentation							25%
------------------------------------
-* rights managment basic/sample implementations			DONE
------------------------------------
 
 * iax.conf et sip.conf : gestion de VoIPAccount
 * gestion d'erreur de crédit négatif ? ? ?
 
+- agi_goto
 --> plugin pour people : avant et après???
 --> menu web
 ---> moteur de session

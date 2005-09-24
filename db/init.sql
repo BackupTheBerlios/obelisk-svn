@@ -6,6 +6,7 @@ insert into module values ( 1, 'people');
 insert into module values ( 2, 'geo');
 insert into module values ( 3, 'outside');
 insert into module values ( 4, 'menu');
+insert into module values ( 5, 'AsteriskGoto');
 
 -- action 0 is always Dial
 -- action <=100 are reserved
@@ -14,6 +15,7 @@ insert into module_action values (1, 0, 'Dial', NULL);
 insert into module_action values (2, 0, 'Dial', NULL);
 insert into module_action values (3, 0, 'Dial', NULL);
 insert into module_action values (4, 0, 'Dial', NULL);
+insert into module_action values (5, 0, 'Dial', NULL);
 
 -- number between 100 and 999 are geographical extension
 insert into extension values ( '000', NULL, 2, '999'); 
@@ -43,6 +45,7 @@ insert into rights values (0, 0, 1);
 insert into rights values (0, 0, 2);
 insert into rights values (0, 0, 3);
 insert into rights values (0, 0, 4);
+insert into rights values (0, 0, 5);
 
 -- sound sequence
 insert into AgiSound values (1, 'notFound');

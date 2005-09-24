@@ -11,7 +11,7 @@ include ('conf_util.inc.php');
 // of your asterisk server
 conf_log(DEBUG_DEBUG, "Sip.conf...");
 
-if (!USE_SER)
+if (!false) // USE_SER
 {
 	$query = "Select VoIPAccount_ID, Name, FirstName, username, pwd, ".
 			"VoIPAccount_People_Extension, canreinvite, host, ".
@@ -22,7 +22,7 @@ if (!USE_SER)
 	$query = $db->query($query);
 	check_db($query);
 
-	while ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED)) 
+	while ($row = $query->fetchRow(DB_FETCHMODE_ORDERED)) 
 	{
 		conf_log(DEBUG_DEBUG, '['.$row[3].'-'.$row[0].']');
 		
