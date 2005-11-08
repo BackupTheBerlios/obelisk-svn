@@ -39,6 +39,7 @@ if (!false) // USE_SER
 		echo 'callerid='.$row[2].' '.$row[1].' <'.$row[5]."> \n";
 		echo 'canreinvite='.($row[6] ? "yes\n" : "no\n");
 		echo 'secret='.$row[4]."\n";
+		echo "nat=yes\n";
 		echo 'dtmfmode='.($row[9] == 1 ? "inband" : 
 					($row[9] == 2 ? "rfc2833" : "info")).
 					"\n\n";

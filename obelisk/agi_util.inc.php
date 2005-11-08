@@ -529,10 +529,10 @@ function agi_call(&$call, $callStr, $callOptions,
 	$total = $priceConn + ceil($answeredTime/60)*$price;
 	if ($dialStatus == "ANSWER")
 	{
+		agi_logCall($call, $price, $answeredTime, $dialStatus);
 		agi_credit($account, -($total));
 	}
-
-	if ($logIfFailed || $dialStatus == "ANSWER")
+	else if ($logIfFailed)
 		agi_logCall($call, $price, $answeredTime, $dialStatus);
 
 	return $total;

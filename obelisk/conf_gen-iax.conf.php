@@ -32,7 +32,7 @@ while ($row = $query->fetchRow(DB_FETCHMODE_ORDERRED))
 			echo "port=".$row[8]."\n";
 	}
 	echo 'callerid='.$row[2].' '.$row[1].' <'.$row[5]."> \n";
-	echo 'notransfer='.($row[6] ? "yes\n" : "no\n");
+	echo 'notransfer='.($row[6]=="t" ? "yes\n" : "no\n");
 	echo 'secret='.$row[4]."\n\n";
 }
 
