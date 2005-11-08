@@ -1,11 +1,15 @@
-Road map
+TODO
 --------
 
-*	Obelisk_menu(${EXTEN})					  5%
+* Obelisk_menu(${EXTEN})					 5%
 * documentation							25%
+* un module qui permet de faire un Goto AGI vers une partie statique de l'extension.conf
+* un script qui vérifie les caller ID venant des lignes externe + définition de l'account ID
+* utilisation de l'account ID
+* trouver une solution pour les appels simmultané sur un même compte qui peuvent provoquer des crédits négatifs
+* ..................
 
 * iax.conf et sip.conf : gestion de VoIPAccount
-* gestion d'erreur de crédit négatif ? ? ?
 
 - agi_goto
 --> plugin pour people : avant et après???

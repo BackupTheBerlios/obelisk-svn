@@ -7,8 +7,7 @@
 4) copy obelisk folder where you want (/usr/share/obelisk) for example
 5) edit /usr/share/obelisk/config.inc.php (link it to /etc/obelisk.conf if you 
 	prefer)
-6) generate your sip and iax.conf using script 
-7) include them after the global or general section in asterisk using #include
-//9) copy WebMenu.php from the sample folder where you want and 
-//	define the menu ID
-10) enjoy
+6) generate your sip and iax.conf using scripts obelisk/gen_conf* 
+7) include them after the global or general section in configuration files of 
+	asterisk (using #include)
+10) enjoy......

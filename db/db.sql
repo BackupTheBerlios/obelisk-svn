@@ -164,7 +164,8 @@ CREATE TABLE Module_Action (
 CREATE TABLE NetworkMask (
   ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
   Network_ID INTEGER UNSIGNED NOT NULL,
-  Mask VARCHAR(16) NOT NULL,
+  extStart extension_type NOT NULL,
+  extEnd extension_type NOT NULL,
   PRIMARY KEY(ID, Network_ID),
   INDEX NetworkMask_FKIndex1(Network_ID),
   FOREIGN KEY(Network_ID)
@@ -175,7 +176,7 @@ CREATE TABLE NetworkMask (
 
 CREATE TABLE VoIPAccount (
   People_Extension extension_type NOT NULL,
-  ID INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  ID INTEGER UNSIGNED NOT NULL,
   VoIPChannel_ID SMALLINT UNSIGNED NOT NULL,
   Enable BOOL NOT NULL,
   PRIMARY KEY(People_Extension, ID),
